@@ -1,0 +1,756 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Project 1 Proposal Workbench</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,400;8..144,500;8..144,700&family=Roboto+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0..1,0&display=block">
+<style>
+/* Layout: Google × Apple workbench — Apple neutrals with blue focus, Google cards, Roboto and Material icons. Step rail left, one form section at a time right; editor beside a live checker. */
+:root{
+  --canvas:#F5F5F7; --surface:#FFFFFF; --chip:#EBEBF0; --ink:#1D1D1F; --ink2:#6E6E73; --line:#D2D2D7;
+  --blue:#007AFF; --blue-text:#0066CC; --tint:#E8F2FF; --on-blue:#FFFFFF;
+  --ok:#1E8E3E; --ok-tint:#E6F4EA; --warn:#B06000; --warn-tint:#FEF7E0;
+  --shadow:0 2px 8px rgba(0,0,0,.07); --shadow-hi:0 6px 20px rgba(0,0,0,.10);
+  --f-ui:"Roboto Flex", Roboto, system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+  --f-mono:"Roboto Mono", "SFMono-Regular", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --canvas:#000000; --surface:#1C1C1E; --chip:#2C2C2E; --ink:#F5F5F7; --ink2:#A1A1A6; --line:#38383A;
+  --blue:#0A84FF; --blue-text:#5AA9FF; --tint:#0E2A4A; --on-blue:#FFFFFF;
+  --ok:#81C995; --ok-tint:#12301D; --warn:#FDD663; --warn-tint:#352B0C;
+  --shadow:0 2px 8px rgba(0,0,0,.6); --shadow-hi:0 6px 20px rgba(0,0,0,.7); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --canvas:#000000; --surface:#1C1C1E; --chip:#2C2C2E; --ink:#F5F5F7; --ink2:#A1A1A6; --line:#38383A;
+  --blue:#0A84FF; --blue-text:#5AA9FF; --tint:#0E2A4A; --on-blue:#FFFFFF;
+  --ok:#81C995; --ok-tint:#12301D; --warn:#FDD663; --warn-tint:#352B0C;
+  --shadow:0 2px 8px rgba(0,0,0,.6); --shadow-hi:0 6px 20px rgba(0,0,0,.7); color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--canvas);color:var(--ink);font-family:var(--f-ui);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:24px 56px;transition:background .25s ease-out,color .25s ease-out}
+.wrap{max-width:1240px;margin:0 auto;display:flex;flex-direction:column;gap:24px}
+h1,h2,h3{text-wrap:balance;margin:0;font-weight:500}
+p{margin:0}
+button{font:inherit;cursor:pointer;color:inherit}
+:focus-visible{outline:3px solid var(--blue);outline-offset:2px;border-radius:8px}
+.ms{font-family:"Material Symbols Outlined";font-weight:400;font-style:normal;font-size:20px;line-height:1;display:inline-block;letter-spacing:normal;text-transform:none;white-space:nowrap;direction:ltr;-webkit-font-feature-settings:"liga";font-feature-settings:"liga";font-variation-settings:"FILL" 0,"wght" 400,"GRAD" 0,"opsz" 24;user-select:none;flex:none}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* Header */
+.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:20px}
+.brand{display:flex;flex-direction:column;gap:8px;min-width:0}
+.kicker{font-size:13px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--blue-text)}
+.brand h1{font-size:clamp(28px,3.6vw,40px);line-height:1.1;letter-spacing:-.01em}
+.brand p{color:var(--ink2);max-width:62ch;font-size:16px}
+.tools{display:flex;flex-direction:column;gap:12px;align-items:flex-end}
+.tool-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:flex-end}
+.btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:8px 16px;font-size:14px;font-weight:500;box-shadow:var(--shadow);transition:border-color .2s ease-out,background .2s ease-out}
+.btn:hover{border-color:var(--blue)}
+.btn .ms{font-size:18px;color:var(--blue)}
+.btn.primary{background:var(--blue);border-color:var(--blue);color:var(--on-blue)}
+.btn.primary .ms{color:var(--on-blue)}
+.btn.armed{border-color:var(--warn);color:var(--warn);background:var(--warn-tint)}
+.btn.armed .ms{color:var(--warn)}
+
+.seg{display:inline-flex;background:var(--chip);border-radius:999px;padding:3px;gap:2px}
+.seg button{border:0;background:transparent;border-radius:999px;padding:6px 12px;font-size:13px;font-weight:500;color:var(--ink2);display:inline-flex;align-items:center;gap:6px;transition:background .2s ease-out,color .2s ease-out}
+.seg button .ms{font-size:18px}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+.seg button[aria-pressed="true"] .ms{color:var(--blue)}
+
+.progress{display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:flex-end}
+.bar{width:200px;max-width:100%;height:8px;background:var(--chip);border-radius:99px;overflow:hidden}
+.bar span{display:block;height:100%;background:var(--blue);width:0;border-radius:99px;transition:width .35s ease-out}
+.progress small{font-size:13px;color:var(--ink2);font-variant-numeric:tabular-nums}
+
+/* Layout */
+.layout{display:grid;grid-template-columns:272px minmax(0,1fr);gap:32px;align-items:start}
+.rail{position:sticky;top:calc(env(safe-area-inset-top, 0px) + 16px);display:flex;flex-direction:column;gap:2px;background:var(--surface);border-radius:16px;box-shadow:var(--shadow);padding:8px}
+.rail-group{font-size:12px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2);padding:14px 12px 6px}
+.step{position:relative;display:grid;grid-template-columns:28px 1fr;gap:12px;align-items:center;text-align:left;border:0;background:transparent;color:var(--ink);padding:8px 12px;border-radius:10px;font-size:14px}
+.step:hover{background:var(--chip)}
+.step[aria-current="true"]{background:var(--tint);font-weight:500}
+.step[aria-current="true"]::before{content:"";position:absolute;left:0;top:8px;bottom:8px;width:4px;border-radius:4px;background:var(--blue)}
+.badge{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:500;font-variant-numeric:tabular-nums;background:var(--chip);color:var(--ink2)}
+.badge.partial{background:var(--warn-tint);color:var(--warn);box-shadow:inset 0 0 0 2px var(--warn)}
+.badge.ready{background:var(--ok);color:var(--surface)}
+.badge.finish{background:var(--tint);color:var(--blue-text)}
+.badge .ms{font-size:16px}
+.legend{display:flex;flex-direction:column;gap:6px;padding:14px 12px 8px;font-size:12px;color:var(--ink2);border-top:1px solid var(--line);margin-top:8px}
+.legend span{display:inline-flex;align-items:center;gap:8px}
+.legend .badge{width:18px;height:18px;font-size:10px}
+.legend .badge .ms{font-size:12px}
+
+/* Pane */
+.pane{display:flex;flex-direction:column;gap:24px;min-width:0}
+.head{display:flex;flex-direction:column;gap:10px}
+.head .eyebrow{font-size:13px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--blue-text)}
+.head h2{font-size:clamp(28px,3.2vw,40px);line-height:1.1;letter-spacing:-.01em}
+.lede{font-size:18px;color:var(--ink2);max-width:66ch;line-height:1.5}
+.rules{display:flex;flex-wrap:wrap;gap:8px;list-style:none;padding:0;margin:4px 0 0}
+.rules li{display:inline-flex;align-items:center;gap:6px;font-size:13px;padding:6px 12px;border-radius:999px;background:var(--chip);color:var(--ink)}
+.rules li .ms{font-size:16px;color:var(--ink2)}
+.rules li.must{background:var(--tint)}
+.rules li.must .ms{color:var(--blue)}
+.rules li b{font-weight:500;color:var(--blue-text)}
+
+.card{background:var(--surface);border-radius:16px;box-shadow:var(--shadow)}
+.sec-title{display:flex;align-items:center;gap:10px;font-size:17px;font-weight:500}
+.sec-title .ms{color:var(--blue);font-size:22px}
+.how{padding:20px 24px;display:flex;flex-direction:column;gap:12px}
+.how ol{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px;max-width:74ch;counter-reset:s}
+.how li{display:grid;grid-template-columns:28px 1fr;gap:12px;align-items:start;counter-increment:s}
+.how li::before{content:counter(s, decimal-leading-zero);width:28px;height:28px;border-radius:50%;background:var(--tint);color:var(--blue-text);font-size:12px;font-weight:500;display:grid;place-items:center;font-variant-numeric:tabular-nums}
+
+.work{display:grid;grid-template-columns:minmax(0,1fr) 312px;gap:24px;align-items:start}
+.editor{padding:20px 24px;display:flex;flex-direction:column;gap:18px;min-width:0}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-weight:500;font-size:15px}
+.field .hint{font-size:13px;color:var(--ink2)}
+input[type=text],textarea,select{width:100%;font:inherit;font-size:15px;color:var(--ink);background:var(--canvas);border:1px solid var(--line);border-radius:10px;padding:10px 12px;transition:border-color .2s ease-out,box-shadow .2s ease-out}
+textarea{resize:vertical;line-height:1.6}
+input[type=text]:focus,textarea:focus,select:focus{border-color:var(--blue);outline:none;box-shadow:0 0 0 4px var(--tint);background:var(--surface)}
+.meter{font-family:var(--f-mono);font-size:12px;color:var(--ink2);font-variant-numeric:tabular-nums}
+
+.checks{position:sticky;top:calc(env(safe-area-inset-top, 0px) + 16px);padding:18px;display:flex;flex-direction:column;gap:12px}
+.checks ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.chk{display:grid;grid-template-columns:auto 1fr;gap:10px;font-size:14px;line-height:1.45;align-items:start}
+.tag{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:500;letter-spacing:.03em;padding:3px 8px 3px 6px;border-radius:999px;white-space:nowrap}
+.tag .ms{font-size:15px}
+.tag.ok{background:var(--ok-tint);color:var(--ok)}
+.tag.warn{background:var(--warn-tint);color:var(--warn)}
+.tag.todo{background:var(--chip);color:var(--ink2)}
+.checks .note{font-size:12px;color:var(--ink2);border-top:1px solid var(--line);padding-top:12px}
+
+.block{display:flex;flex-direction:column;gap:14px}
+.example{overflow:hidden}
+.example summary{list-style:none;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:16px 24px;cursor:pointer;flex-wrap:wrap}
+.example summary::-webkit-details-marker{display:none}
+.example summary .sub{font-size:13px;color:var(--ink2)}
+.example summary .chev{transition:transform .25s ease-out;color:var(--ink2)}
+.example[open] summary .chev{transform:rotate(180deg)}
+.example .body{border-top:1px solid var(--line);padding:20px 24px;display:flex;flex-direction:column;gap:16px}
+.ex-item{display:flex;flex-direction:column;gap:6px}
+.ex-item b{font-size:13px;color:var(--ink2);font-weight:500}
+.ex-text{white-space:pre-wrap;max-width:74ch;background:var(--canvas);border-radius:12px;padding:14px 16px;font-size:15px;line-height:1.6}
+.takeaway{display:grid;grid-template-columns:32px 1fr;gap:12px;align-items:start;background:var(--tint);border-radius:12px;padding:14px 16px;font-size:15px;max-width:none}
+.takeaway .i{width:32px;height:32px;border-radius:50%;background:var(--blue);color:var(--on-blue);display:grid;place-items:center}
+.takeaway .i .ms{font-size:18px}
+.takeaway strong{font-weight:500;color:var(--blue-text);display:block}
+.ex-why{font-size:14px;color:var(--ink2);max-width:74ch}
+.ex-why strong{color:var(--ink);font-weight:500}
+.ex-actions{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.ex-actions small{color:var(--ink2);font-size:13px}
+
+.mistakes{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.mistake{padding:16px 18px;display:flex;flex-direction:column;gap:8px;font-size:14px}
+.mistake .bad,.mistake .fix{display:grid;grid-template-columns:20px 1fr;gap:8px;align-items:start}
+.mistake .bad{color:var(--ink);font-weight:500}
+.mistake .bad .ms{color:var(--warn);font-size:20px}
+.mistake .fix{color:var(--ink2)}
+.mistake .fix .ms{color:var(--ok);font-size:20px}
+
+.scroll{overflow-x:auto;border-radius:12px;background:var(--surface);border:1px solid var(--line)}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{border-bottom:1px solid var(--line);padding:10px 12px;text-align:left;vertical-align:top}
+th{font-size:12px;font-weight:500;color:var(--ink2);letter-spacing:.03em;background:var(--canvas)}
+tr:last-child td{border-bottom:0}
+.lr td input{min-width:130px;padding:6px 8px;font-size:14px}
+.lr td.n{color:var(--ink2);width:32px;font-variant-numeric:tabular-nums}
+.icon-btn{border:0;background:transparent;color:var(--ink2);padding:4px;border-radius:8px;display:grid;place-items:center}
+.icon-btn:hover{color:var(--warn);background:var(--warn-tint)}
+
+.phases{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.phase{background:var(--canvas);border:1px solid var(--line);border-radius:12px;display:flex;flex-direction:column;min-width:0}
+.phase header{padding:12px 14px;display:grid;grid-template-columns:32px 1fr;gap:10px;align-items:center;border-bottom:1px solid var(--line)}
+.phase header .num{width:32px;height:32px;border-radius:50%;background:var(--blue);color:var(--on-blue);display:grid;place-items:center;font-weight:500;font-size:15px}
+.phase header b{font-size:15px;font-weight:500;display:block}
+.phase header span.k{font-size:11px;color:var(--ink2);text-transform:uppercase;letter-spacing:.06em}
+.phase .inner{padding:12px 14px;display:flex;flex-direction:column;gap:10px;font-size:14px}
+.phase .obj{font-size:13px;color:var(--ink2)}
+.phase .lab{font-size:11px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--blue-text)}
+.phase textarea{font-size:14px;padding:8px 10px;background:var(--surface)}
+.example .phase{background:var(--canvas)}
+
+.pager{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding-top:8px}
+
+/* Review */
+.summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.sum{border:0;background:var(--surface);border-radius:16px;box-shadow:var(--shadow);padding:16px 18px;display:flex;flex-direction:column;gap:8px;text-align:left;transition:box-shadow .2s ease-out}
+.sum:hover{box-shadow:var(--shadow-hi)}
+.sum .row{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.sum b{font-size:15px;font-weight:500}
+.sum small{font-size:13px;color:var(--ink2);font-variant-numeric:tabular-nums}
+.matrix td{min-width:160px}
+.matrix td.k{font-size:12px;font-weight:500;color:var(--ink2);min-width:70px;white-space:nowrap}
+.empty-cell{color:var(--ink2);font-style:italic}
+.copybox{padding:20px 24px}
+.copybox textarea{font-family:var(--f-mono);font-size:13px}
+.banner{display:grid;grid-template-columns:22px 1fr;gap:10px;background:var(--tint);border-radius:12px;padding:12px 16px;font-size:14px}
+.banner .ms{color:var(--blue)}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom, 0px) + 24px);background:var(--ink);color:var(--canvas);padding:10px 18px;border-radius:999px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .25s ease-out;box-shadow:var(--shadow-hi)}
+.toast.show{opacity:1}
+
+@media (max-width:1000px){
+  .work{grid-template-columns:minmax(0,1fr)}
+  .checks{position:static}
+}
+@media (max-width:840px){
+  .layout{grid-template-columns:minmax(0,1fr)}
+  .tools{align-items:flex-start}
+  .tool-row,.progress{justify-content:flex-start}
+  .rail{position:static;flex-direction:row;overflow-x:auto;gap:6px;padding:6px}
+  .rail-group,.legend{display:none}
+  .step{flex:0 0 auto;white-space:nowrap;grid-template-columns:24px auto}
+  .step[aria-current="true"]::before{display:none}
+  .badge{width:24px;height:24px}
+  .phases{grid-template-columns:minmax(0,1fr)}
+  .how,.editor,.copybox{padding:16px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <p class="kicker">Master of Cyber Security · Project 1 (MECR2415)</p>
+      <h1>Project 1 Proposal Workbench</h1>
+      <p>Work through the proposal form one section at a time. Each step explains what the panel expects, shows a worked example, and checks your draft as you type.</p>
+    </div>
+    <div class="tools">
+      <div class="seg" role="group" aria-label="Appearance">
+        <button type="button" data-theme-set="auto" aria-pressed="false"><span class="ms" aria-hidden="true">brightness_auto</span>Auto</button>
+        <button type="button" data-theme-set="light" aria-pressed="false"><span class="ms" aria-hidden="true">light_mode</span>Light</button>
+        <button type="button" data-theme-set="dark" aria-pressed="false"><span class="ms" aria-hidden="true">dark_mode</span>Dark</button>
+      </div>
+      <div class="progress" aria-live="polite"><div class="bar"><span id="bar"></span></div><small id="progressText">0 of 13 sections ready</small></div>
+      <div class="tool-row">
+        <button class="btn" id="loadExample" type="button"><span class="ms" aria-hidden="true">auto_stories</span><span class="lbl">Load full example</span></button>
+        <button class="btn" id="clearAll" type="button"><span class="ms" aria-hidden="true">restart_alt</span><span class="lbl">Clear my draft</span></button>
+      </div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <nav class="rail" id="rail" aria-label="Proposal sections"></nav>
+    <main class="pane" id="pane"></main>
+  </div>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(function(){
+const KEY = "mecr-p1-workbench-v1";
+const NOW_Y = new Date().getFullYear();
+
+function blankLR(){ return Array.from({length:10}, () => ({a:"",t:"",d:"",r:"",l:""})); }
+function blank(){
+  return {title:"",type:"",intro:"",background:"",ps:"",rqMain:"",srq1:"",srq2:"",srq3:"",aim:"",obj1:"",obj2:"",obj3:"",
+    scope:"",lr:blankLR(),synthesis:"",p1i:"",p1p:"",p1o:"",p2i:"",p2p:"",p2o:"",p3i:"",p3p:"",p3o:"",contrib:"",refs:"",sw:"",hw:"",tech:""};
+}
+let S = blank();
+try{ const raw = localStorage.getItem(KEY); if(raw){ const d = JSON.parse(raw); S = Object.assign(blank(), d); if(!Array.isArray(S.lr) || !S.lr.length) S.lr = blankLR(); } }catch(e){}
+let saveT;
+function save(){ clearTimeout(saveT); saveT = setTimeout(() => { try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }, 300); }
+
+/* ---------- text helpers ---------- */
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const words = s => (s.trim().match(/\S+/g) || []).length;
+const paras = s => s.split(/\n+/).filter(x => x.trim().length > 40).length;
+const lines = s => s.split(/\n+/).map(x => x.trim()).filter(Boolean);
+function cites(s){
+  const a = (s.match(/\[\s*\d+(?:\s*[,–\-]\s*\d+)*\s*\]/g) || []).length;
+  const b = (s.match(/\([A-Z][A-Za-z'\-]+(?:\s+et al\.)?(?:\s+(?:and|&)\s+[A-Z][A-Za-z'\-]+)?,?\s+\d{4}[a-z]?\)/g) || []).length;
+  return a + b;
+}
+const STOP = new Set("about above after again against also among based been being between both could does doing during each from further have having into itself more most other over same should some such than that their them then there these they this those through under until upon using very what when where which while will with within would your study research project propose proposed enhanced improve improving improved approach existing based networks network".split(" "));
+function keys(s){ return new Set((s.toLowerCase().match(/[a-z][a-z\-]{3,}/g) || []).filter(w => !STOP.has(w)).map(w => w.replace(/s$/,""))); }
+function overlap(a,b){ const A = keys(a), B = keys(b); let n = 0; A.forEach(w => { if(B.has(w)) n++; }); return n; }
+const WEAK = ["study","understand","learn","know","see","look","collect","gather","read","find","do","explore","get"];
+const ARTEFACT = /\b(model|framework|scheme|algorithm|system|approach|technique|method|architecture|tool|protocol|mechanism|guideline|checklist)s?\b/i;
+const ok = t => ({s:"ok",t}), warn = t => ({s:"warn",t}), todo = t => ({s:"todo",t});
+const empty = s => !s || !s.trim();
+
+/* ---------- worked example (illustrative IDS topic) ---------- */
+const EX = {
+title:"An Enhanced Intrusion Detection Model Using Hybrid Feature Selection and Ensemble Learning for IoT Healthcare Networks",
+type:"Information Security Analysis & Mechanism (e.g. Detection, PenTest, Forensic)",
+intro:"Network security protects the confidentiality, integrity and availability of data as it moves between connected devices [1]. Healthcare providers now depend on networked medical devices, electronic health records and remote patient monitoring, which widens the attack surface of hospital networks. According to [2], healthcare organisations reported [number] security incidents in [year], making network protection a direct patient-safety concern.\n\nIntrusion detection is a key research area within network security. An intrusion detection system (IDS) monitors network traffic to identify malicious activity that firewalls and access controls miss [3]. Machine learning based IDS can recognise new attack patterns, but IoT healthcare networks generate high-volume, imbalanced traffic from resource-limited devices, which makes accurate and timely detection difficult [4]. Improving intrusion detection for these networks is therefore important for protecting both patient data and clinical services.",
+background:"Researchers have approached intrusion detection in IoT networks with signature-based and anomaly-based methods. Signature-based IDS detect known attacks accurately but cannot recognise new variants [5]. Anomaly-based IDS using machine learning were introduced to close this gap, yet several studies report high false-positive rates when attack classes are imbalanced [6], [7].\n\nA second challenge is the high dimensionality of IoT traffic data. Filter and wrapper feature selection methods have been used to remove irrelevant features and shorten training time [8], [9]. However, single-method feature selection can discard features that matter for rare attack classes [9].\n\nA third challenge is robustness. Ensemble learning combines several classifiers to give more stable results across attack types [10]. Studies in IoT settings, however, note longer detection times when ensembles run on resource-limited devices [11]. Together, these challenges show that accuracy, false alarms and detection time still need to be balanced.",
+ps:"Existing machine learning based IDS for IoT networks [6], [9] achieve high overall accuracy, but they report high false-positive rates and weak detection of minority attack classes when traffic is imbalanced (a false-positive rate of [X]% is reported in [9]). This happens because single-method feature selection removes features that are important for rare attacks, and single classifiers tend to favour majority classes [9], [11]. As a result, security teams in healthcare settings face alert fatigue and may miss rare but critical attacks. Therefore, this study proposes an enhanced intrusion detection model that combines hybrid feature selection with ensemble learning to reduce false positives while keeping detection time acceptable for IoT healthcare networks.",
+rqMain:"How can hybrid feature selection and ensemble learning improve intrusion detection in IoT healthcare networks?",
+srq1:"How do existing machine learning based intrusion detection approaches perform, and what limits them in IoT healthcare networks?",
+srq2:"How can a hybrid feature selection and ensemble learning model be designed to address these limitations?",
+srq3:"How effective is the proposed model compared with existing models in accuracy, false-positive rate and detection time?",
+aim:"To develop an enhanced intrusion detection model based on hybrid feature selection and ensemble learning that reduces false-positive rates and improves the detection of minority attack classes in IoT healthcare networks.",
+obj1:"To investigate existing machine learning based intrusion detection approaches and identify their limitations in IoT healthcare networks.",
+obj2:"To design and develop an enhanced intrusion detection model using hybrid feature selection and ensemble learning.",
+obj3:"To evaluate the proposed model against existing models in terms of accuracy, false-positive rate and detection time.",
+scope:"- Uses the [dataset name and version] public IoT intrusion dataset [ref]\n- Covers DoS, brute-force, reconnaissance and spoofing attacks only\n- Hybrid feature selection combines one filter method and one wrapper method\n- Experiments are offline only; real-time deployment in a hospital network is excluded\n- Evaluation metrics: accuracy, precision, recall, F1-score, false-positive rate and detection time",
+lr:[
+ {a:"[Author] et al. (2023) [6]",t:"Random forest anomaly IDS",d:"[IoT dataset]",r:"High accuracy; FPR [X]%",l:"High false positives on imbalanced classes"},
+ {a:"[Author] et al. (2022) [9]",t:"Filter feature selection + SVM",d:"[IoT dataset]",r:"Shorter training time",l:"Drops features needed for rare attacks"},
+ {a:"[Author] et al. (2024) [11]",t:"Stacking ensemble",d:"[IoT dataset]",r:"Stable accuracy across classes",l:"Long detection time on edge devices"}
+],
+synthesis:"Across the reviewed works, three gaps recur: (1) high false-positive rates when attack classes are imbalanced, (2) feature selection that removes features needed to detect rare attacks, and (3) detection times that are too long for resource-limited IoT devices. These gaps form the problem statement of this study and the benchmarks for its evaluation.",
+p1i:"Related papers; candidate public IoT intrusion datasets",
+p1p:"Review and compare existing ML-based IDS; analyse dataset characteristics and limitations",
+p1o:"Comparison table; list of limitations; model requirements",
+p2i:"Requirements and selected dataset from Phase 1",
+p2p:"Pre-process data; apply hybrid feature selection; design and train the ensemble model",
+p2o:"The enhanced intrusion detection model",
+p3i:"Proposed model; benchmark models from the literature",
+p3p:"Test using accuracy, precision, recall, F1-score, false-positive rate and detection time; compare results",
+p3o:"Evaluation results and comparison against benchmarks",
+contrib:"- A comparative analysis of machine learning based IDS for IoT healthcare networks, useful to researchers in the field (Objective 1)\n- An enhanced intrusion detection model using hybrid feature selection and ensemble learning (Objective 2)\n- Benchmark results showing how the model performs against existing models (Objective 3)\n- Practical guidance for healthcare security teams on reducing false alarms",
+refs:"[1] A. Author and B. Author, \"Title of the paper,\" Journal Name, vol. X, no. Y, pp. 1–15, 2024, doi: [DOI].\n[2] [Organisation], \"Title of the threat report,\" [Publisher], [Year]. [Online]. Available: [URL]\n[3] C. Author, D. Author, and E. Author, \"Title of the conference paper,\" in Proc. [Conference Name], [City], 2023, pp. 100–110.",
+sw:"Python 3.x with scikit-learn, pandas and NumPy; Jupyter Notebook; Git for version control",
+hw:"Laptop with a multi-core CPU and 16 GB RAM; optional GPU for larger experiments",
+tech:"Filter feature selection (e.g. information gain) combined with wrapper feature selection; ensemble classifiers (e.g. random forest, gradient boosting)"
+};
+
+/* ---------- sections ---------- */
+const TYPES = ["Information Security Management & System","Information Security Analysis & Mechanism (e.g. Detection, PenTest, Forensic)","Cryptography","Mobile and Wireless Security","Security Applications in Computing (e.g. Cloud, Grid, Distributed Environment)","Others"];
+
+const SECTIONS = [
+{ id:"title", group:"Section A", name:"Research Title", fields:["title","type"],
+  lede:"Your title names exactly what you will build, how you will build it, and where it applies. The panel reads it first and uses it to judge every other section.",
+  rules:[["must","Technique + artefact + context"],["","One artefact only"],["","Type of Project must match"]],
+  how:["Name the artefact you will produce: a model, framework, scheme, algorithm or system.","Add the specific technique or approach you will use to build it.","Add the domain, platform or case study it applies to.","Tick the Type of Project that matches the artefact."],
+  render: () => field("title","Research title","text","Aim for 10 to 20 words.") + selectField("type","Type of Project (Section B checkbox)",TYPES),
+  ex: [["Research title","title"],["Type of Project","type"]],
+  why:"<strong>Why it works:</strong> it names one artefact (an intrusion detection model), one technique (hybrid feature selection and ensemble learning) and one context (IoT healthcare networks).",
+  mistakes:[["Too broad: “Cybersecurity in Healthcare”","Name the artefact and the technique, not just the topic."],["Buzzword stacking: “AI-Blockchain-Zero-Trust Framework”","Pick the one technique your study will actually build on."],["Type of Project ticked does not match the title","A detection model belongs under Analysis & Mechanism."]],
+  checks: s => {
+    const r = [];
+    if(empty(s.title)) r.push(todo("Write your title"));
+    else {
+      const w = words(s.title);
+      r.push(w >= 8 && w <= 25 ? ok(`Length is reasonable (${w} words)`) : warn(`${w} words: aim for about 10 to 20`));
+      r.push(ARTEFACT.test(s.title) ? ok("Names an artefact (model, framework, scheme…)") : warn("Name the artefact: model, framework, scheme, algorithm or system"));
+      r.push(/\b(for|in|on)\b/i.test(s.title) ? ok("States a context (for / in …)") : warn("Add the domain, platform or case study (“for …”, “in …”)"));
+    }
+    r.push(empty(s.type) ? todo("Choose the Type of Project") : ok("Type of Project chosen"));
+    return r;
+  }},
+{ id:"intro", group:"Section B", name:"Introduction", fields:["intro"],
+  lede:"Two paragraphs that move from the broad research domain to your specific research area, and show why it matters now.",
+  rules:[["must","Exactly 2 paragraphs"],["must","Max 1 page"],["must","Show importance of the domain"],["","Cite your sources"]],
+  how:["Paragraph 1, research domain: what it is and why it matters (e.g. Network Security). Support it with a recent, cited figure.","Paragraph 2, research area: the specific area you work in (e.g. Intrusion Detection), its benefits, and why it is needed now.","End by narrowing toward the problem, so the next section follows naturally."],
+  render: () => field("intro","Introduction","area","Separate the two paragraphs with a blank line.",10),
+  ex: [["Introduction","intro"]],
+  why:"<strong>Why it works:</strong> paragraph 1 sets the domain and its importance with a cited figure; paragraph 2 narrows to intrusion detection and says why it is hard in this context. Bracketed values are placeholders for real figures from your sources.",
+  mistakes:[["Reads like a textbook definition","Explain why the area matters now, with evidence."],["No recent figures or citations","Use at least one cited figure per paragraph."],["Three or more paragraphs, or over a page","Keep it to two focused paragraphs."]],
+  checks: s => {
+    if(empty(s.intro)) return [todo("Write two paragraphs")];
+    const p = paras(s.intro), w = words(s.intro), c = cites(s.intro);
+    return [
+      p === 2 ? ok("Two paragraphs") : warn(`${p} paragraph(s) detected: the form asks for 2`),
+      w <= 500 ? ok(`Fits about one page (${w} words)`) : warn(`${w} words: one page is about 450–500`),
+      c >= 2 ? ok(`${c} citations`) : warn(`${c} citation(s): support each paragraph with a source`),
+      /important|crucial|critical|need|essential|significan|vital/i.test(s.intro) ? ok("States why the area matters") : warn("Say why the domain or area is important or needed")
+    ];
+  }},
+{ id:"background", group:"Section B", name:"Problem Background", fields:["background"],
+  lede:"A summary of the research problems others have already worked on in your area, and what remains unsolved. It sets up the gap without stating it yet.",
+  rules:[["must","3–4 paragraphs"],["must","Max 1 page"],["must","Citations"],["","Fishbone or taxonomy diagram (optional)"]],
+  how:["List the main challenges in your research area (for example accuracy, data dimensionality, robustness).","Give each challenge its own paragraph: how earlier researchers addressed it [cite], and what still remains.","Close by showing which challenges are still open. Keep your own proposal out of this section.","Optional: sketch a fishbone or taxonomy diagram of these challenges and attach it to the form."],
+  render: () => field("background","Problem background","area","One paragraph per challenge, separated by blank lines.",12),
+  ex: [["Problem background","background"]],
+  why:"<strong>Why it works:</strong> each paragraph follows the same pattern: a challenge, how prior work tackled it with citations, and what remains. It funnels toward the gap without proposing the solution yet.",
+  mistakes:[["Confused with the Problem Statement","Here you summarise others’ work; the gap comes next."],["Problems listed with no one credited","Cite who tackled each challenge."],["A literature list with no thread","Group by challenge, not by paper."]],
+  checks: s => {
+    if(empty(s.background)) return [todo("Write 3–4 paragraphs")];
+    const p = paras(s.background), w = words(s.background), c = cites(s.background);
+    return [
+      p >= 3 ? ok(`${p} paragraphs`) : warn(`${p} paragraph(s): the form asks for 3–4`),
+      w <= 520 ? ok(`Fits about one page (${w} words)`) : warn(`${w} words: one page is about 450–500`),
+      c >= 3 ? ok(`${c} citations`) : warn(`${c} citation(s): credit the work behind each challenge`),
+      /however|but|yet|remain|limit|still|challenge/i.test(s.background) ? ok("Shows what remains unsolved") : warn("Say what remains unsolved after each challenge")
+    ];
+  }},
+{ id:"ps", group:"Section B", name:"Problem Statement", fields:["ps"],
+  lede:"The specific gap your project will close, built from the cited limitations of similar previous works. This is the section the panel weighs most heavily.",
+  rules:[["must","Limitations of previous works"],["must","Citations"],["","Main hypothesis (optional)"],["","Cited works = Ch. 5 benchmarks"]],
+  how:["Name the existing approaches closest to yours and cite them.","State their limitation precisely, with a reported figure where possible.","Explain why the limitation happens.","State the consequence for the domain.","End with what this study proposes to address it."],
+  render: () => `<div class="banner"><span class="ms" aria-hidden="true">lightbulb</span><span>A pattern that works: <em>Existing approaches [x], [y] achieve A, but suffer from B (reported as C in [z]) because D. As a result, E. Therefore, this study proposes F.</em></span></div>` + field("ps","Problem statement","area","One or two paragraphs.",9),
+  ex: [["Problem statement","ps"]],
+  why:"<strong>Why it works:</strong> it follows the pattern exactly. The limitation is specific and cited, the cause is explained, the consequence is stated, and the proposal answers the gap. Works [6], [9] and [11] will become the benchmarks in Chapter 5 and must appear in the comparison table.",
+  mistakes:[["“No research has been done on this”","Prove the gap with cited limitations instead."],["Vague gaps such as “accuracy is still low”","Quote what was reported and where."],["The only gap is “not yet applied in Malaysia”","Explain why the local context changes the problem."]],
+  checks: s => {
+    if(empty(s.ps)) return [todo("Write your problem statement")];
+    const r = [];
+    const c = cites(s.ps);
+    r.push(c >= 2 ? ok(`${c} citations to previous works`) : warn(`${c} citation(s): cite the works whose limits you describe`));
+    r.push(/however|but|suffer|limit|lack|fail|weak|unable|high false|low/i.test(s.ps) ? ok("States limitations of previous works") : warn("State what previous works cannot do"));
+    r.push(/because|due to|caused|since/i.test(s.ps) ? ok("Explains why the limitation happens") : warn("Explain the cause (“because …”)"));
+    r.push(/this (study|research|project|work) (proposes|aims|will|intends)/i.test(s.ps) ? ok("Ends with what this study proposes") : warn("End with “Therefore, this study proposes …”"));
+    if(/no (research|study|studies|work|works|one) (has|have)|never been (studied|done|explored)/i.test(s.ps)) r.push(warn("Avoid uncited “no research has been done” claims"));
+    return r;
+  }},
+{ id:"rq", group:"Section B", name:"Research Questions", fields:["rqMain","srq1","srq2","srq3"],
+  lede:"One main question that mirrors your aim, plus three supporting questions, one for each objective and methodology phase.",
+  rules:[["must","1 main RQ + 3 sub-RQs"],["must","All start with “How”"],["must","Main RQ ↔ Aim"],["must","Each SRQ ↔ one objective"]],
+  how:["Write the main RQ by turning your title into a “How…” question.","SRQ1 usually asks how existing approaches perform and what limits them (Phase 1: investigate).","SRQ2 asks how your artefact can be designed to address those limits (Phase 2: design).","SRQ3 asks how effective your artefact is against existing ones, naming your metrics (Phase 3: evaluate)."],
+  render: () => field("rqMain","Main research question","area","",2) + field("srq1","Sub-RQ 1 (investigate)","area","",2) + field("srq2","Sub-RQ 2 (design)","area","",2) + field("srq3","Sub-RQ 3 (evaluate)","area","",2),
+  ex: [["Main RQ","rqMain"],["SRQ1","srq1"],["SRQ2","srq2"],["SRQ3","srq3"]],
+  why:"<strong>Why it works:</strong> every question starts with “How”. The main RQ restates the title, and the three SRQs follow the investigate → design → evaluate sequence that the objectives and phases will use.",
+  mistakes:[["Yes/no questions (“Can ML detect intrusions?”)","Rewrite as “How can… / How effective…”."],["Four or five sub-questions","Keep exactly three, one per objective."],["SRQ3 has no measures","Name the metrics you will compare."]],
+  checks: s => {
+    const r = [];
+    const qs = [["Main RQ",s.rqMain],["SRQ1",s.srq1],["SRQ2",s.srq2],["SRQ3",s.srq3]];
+    qs.forEach(([n,q]) => {
+      if(empty(q)) r.push(todo(`Write ${n}`));
+      else r.push(/^\s*how\b/i.test(q) ? ok(`${n} starts with “How”`) : warn(`${n} should start with “How”`));
+    });
+    if(!empty(s.rqMain) && !empty(s.title)){
+      const o = overlap(s.rqMain, s.title);
+      r.push(o >= 2 ? ok("Main RQ shares key terms with the title") : warn("Main RQ should reuse the title’s key terms"));
+    }
+    if(!empty(s.srq3)) r.push(/accura|precision|recall|f1|false|time|rate|perform|effective|usab|metric/i.test(s.srq3) ? ok("SRQ3 names how success is measured") : warn("SRQ3 should name the measures you will compare"));
+    return r;
+  }},
+{ id:"aim", group:"Section B", name:"Research Aim", fields:["aim"],
+  lede:"One sentence that states the main purpose of the research. It must match your title.",
+  rules:[["must","1 short paragraph"],["must","Aligned with the title"]],
+  how:["Start with “To develop / To propose / To design …”.","Name the same artefact, technique and context as your title.","Add the measurable improvement you expect (for example fewer false positives)."],
+  render: () => field("aim","Research aim","area","One or two sentences.",3),
+  ex: [["Research aim","aim"]],
+  why:"<strong>Why it works:</strong> it reuses the title’s artefact, technique and context, then adds the intended improvement in measurable terms.",
+  mistakes:[["Introduces something not in the title","Keep the same artefact and context."],["Lists every task of the project","That is what objectives are for."],["Vague purpose: “to improve security”","Say what improves and how you will tell."]],
+  checks: s => {
+    if(empty(s.aim)) return [todo("Write your aim")];
+    const r = [];
+    r.push(/^\s*to\s+\w+/i.test(s.aim) ? ok("Starts with “To …”") : warn("Start with “To develop / To propose …”"));
+    const w = words(s.aim); r.push(w <= 60 ? ok(`Concise (${w} words)`) : warn(`${w} words: keep the aim short`));
+    if(!empty(s.title)){ const o = overlap(s.aim, s.title); r.push(o >= 3 ? ok("Matches the title’s key terms") : warn("Reuse more of the title’s key terms")); }
+    else r.push(todo("Write the title to check alignment"));
+    return r;
+  }},
+{ id:"obj", group:"Section B", name:"Research Objectives", fields:["obj1","obj2","obj3"],
+  lede:"Exactly three objectives, each achieved in one phase of your methodology. Each must produce a result an examiner can check.",
+  rules:[["must","Only 3 objectives"],["must","Each ↔ one methodology phase"],["","Measurable verbs"]],
+  how:["Objective 1 (Phase 1): investigate or identify (for example existing approaches and their limits).","Objective 2 (Phase 2): design, develop or propose your artefact.","Objective 3 (Phase 3): evaluate or validate it, naming the measures.","Use verbs whose outcome can be checked: investigate, identify, analyse, design, develop, propose, implement, evaluate, validate, compare."],
+  render: () => field("obj1","Objective 1 (Phase 1)","area","",2) + field("obj2","Objective 2 (Phase 2)","area","",2) + field("obj3","Objective 3 (Phase 3)","area","",2),
+  ex: [["Objective 1","obj1"],["Objective 2","obj2"],["Objective 3","obj3"]],
+  why:"<strong>Why it works:</strong> each objective answers one sub-RQ, uses a checkable verb (investigate, design and develop, evaluate) and maps to one phase.",
+  mistakes:[["Tasks written as objectives (“To collect a dataset”)","Collecting data is a step inside a phase."],["Weak verbs: “to study”, “to understand”","Use investigate, design, evaluate."],["Four or five objectives","The form allows only three."]],
+  checks: s => {
+    const r = [];
+    [1,2,3].forEach(i => {
+      const o = s["obj"+i];
+      if(empty(o)){ r.push(todo(`Write Objective ${i}`)); return; }
+      const m = o.trim().match(/^to\s+([a-z]+)/i);
+      if(!m) r.push(warn(`Objective ${i} should start with “To …”`));
+      else if(WEAK.includes(m[1].toLowerCase())) r.push(warn(`Objective ${i}: “${m[1]}” is hard to measure; try investigate, design or evaluate`));
+      else r.push(ok(`Objective ${i} uses a measurable verb (“${m[1]}”)`));
+      const q = s["srq"+i];
+      if(!empty(q)) r.push(overlap(o,q) >= 1 ? ok(`Objective ${i} answers SRQ${i}`) : warn(`Objective ${i} and SRQ${i} share no key terms`));
+    });
+    return r;
+  }},
+{ id:"scope", group:"Section B", name:"Research Scope", fields:["scope"],
+  lede:"The boundaries of your study: what data, cases, techniques and measures you will use, and what you will leave out.",
+  rules:[["","Type & reference of datasets"],["","Type of case study"],["","Techniques to implement"],["","Exclusions"]],
+  how:["List one boundary per line.","Name the dataset (with version and reference) or the case study organisation type.","State which attacks, scenarios or components are covered.","Name the techniques and the evaluation metrics.","State what is excluded, such as real-time deployment."],
+  render: () => field("scope","Research scope","area","One boundary per line, starting with “-”.",7),
+  ex: [["Research scope","scope"]],
+  why:"<strong>Why it works:</strong> each line is a clear boundary. The panel can see the dataset, attack types, techniques, metrics and what is out of scope.",
+  mistakes:[["“This research focuses on IDS”","That is a topic. List the boundaries."],["Dataset named without version or source","Give the version and reference."],["No exclusions","Say what you will not do."]],
+  checks: s => {
+    if(empty(s.scope)) return [todo("List your boundaries")];
+    const n = lines(s.scope).length;
+    return [
+      n >= 4 ? ok(`${n} boundaries listed`) : warn(`${n} line(s): list at least 4 boundaries`),
+      /dataset|data set|case study|organi[sz]ation|respondent|sample/i.test(s.scope) ? ok("Names the data or case study") : warn("Name the dataset or case study"),
+      /accura|precision|recall|f1|false|metric|detection time|latency|throughput|usab|measure/i.test(s.scope) ? ok("Names evaluation measures") : warn("Name the measures you will use"),
+      /exclud|not (include|cover|consider)|only|limited to|out of scope/i.test(s.scope) ? ok("States what is excluded") : warn("State what is out of scope")
+    ];
+  }},
+{ id:"lr", group:"Section B", name:"Literature Review", fields:["lr","synthesis"],
+  lede:"A comparison table of similar works, followed by a short synthesis that groups their limitations into the gaps used in your problem statement.",
+  rules:[["must","Table of comparison, ≥10 works"],["must","Summarise the gaps"],["must","Align with Problem Statement"],["","Citations"]],
+  how:["Collect at least 10 works close to your topic, mostly from the last five years.","Fill the same five columns for every work. The Limitation column is the one the panel reads most closely.","Make sure every work cited in your problem statement appears in this table.","Below the table, group the limitations into two or three gaps. These must match your problem statement."],
+  render: renderLR,
+  exRender: () => `<div class="scroll"><table><tr><th>Author / Year</th><th>Technique</th><th>Dataset / Context</th><th>Metrics & Results</th><th>Limitation</th></tr>${EX.lr.map(r => `<tr><td>${esc(r.a)}</td><td>${esc(r.t)}</td><td>${esc(r.d)}</td><td>${esc(r.r)}</td><td>${esc(r.l)}</td></tr>`).join("")}</table></div><div class="ex-item"><b>Gap synthesis</b><div class="ex-text">${esc(EX.synthesis)}</div></div>`,
+  why:"<strong>Why it works:</strong> the columns are identical for every work, the limitation is specific, and the synthesis turns the limitations into three gaps that reappear in the problem statement. Your table needs at least 10 rows; the example shows 3.",
+  mistakes:[["Fewer than 10 works, or mostly old papers","Aim for 10+ from the last five years."],["Columns change from paper to paper","Use the same five columns throughout."],["No synthesis after the table","Group limitations into 2–3 gaps."]],
+  checks: s => {
+    const filled = s.lr.filter(r => r.a.trim() && r.t.trim()).length;
+    const lim = s.lr.filter(r => r.a.trim() && r.t.trim() && r.l.trim()).length;
+    const r = [];
+    r.push(filled === 0 ? todo("Add your first related work") : (filled >= 10 ? ok(`${filled} works compared`) : warn(`${filled} of at least 10 works`)));
+    if(filled) r.push(lim === filled ? ok("Every work has a limitation") : warn(`${filled - lim} work(s) missing a limitation`));
+    if(empty(s.synthesis)) r.push(todo("Write the gap synthesis"));
+    else {
+      r.push(words(s.synthesis) >= 35 ? ok("Synthesis written") : warn("Synthesis is thin: group limitations into 2–3 gaps"));
+      if(!empty(s.ps)) r.push(overlap(s.synthesis, s.ps) >= 3 ? ok("Gaps match the problem statement") : warn("Gaps and problem statement share few terms"));
+    }
+    return r;
+  }},
+{ id:"method", group:"Section B", name:"Proposed Methodology", fields:["p1i","p1p","p1o","p2i","p2p","p2o","p3i","p3p","p3o"],
+  lede:"Your research framework: three phases, one for each objective, each showing its input, process and output. Draw this as a diagram on the form and explain each phase.",
+  rules:[["must","Framework diagram, 3 phases"],["must","Input → process → output per phase"],["must","Each phase ↔ one objective"],["must","Explain each phase"]],
+  how:["Copy each objective into the matching phase (shown above each column).","Input: what you start the phase with (papers, datasets, requirements).","Process: what you actually do.","Output: what the phase produces. It is usually the next phase’s input.","Turn these three columns into your framework diagram, then write one paragraph per phase."],
+  render: renderMethod,
+  exRender: () => `<div class="phases">${[1,2,3].map(i => `<div class="phase"><header><span class="num">${i}</span><span><span class="k">Phase ${i} · Objective ${i}</span><b>${["Investigation","Design and development","Evaluation"][i-1]}</b></span></header><div class="inner"><div><div class="lab">Input</div>${esc(EX["p"+i+"i"])}</div><div><div class="lab">Process</div>${esc(EX["p"+i+"p"])}</div><div><div class="lab">Output</div>${esc(EX["p"+i+"o"])}</div></div></div>`).join("")}</div>`,
+  why:"<strong>Why it works:</strong> each phase delivers one objective, its inputs and outputs are concrete, and the output of each phase feeds the next.",
+  mistakes:[["Generic flow: Literature Review → Design → Testing → Report","Show real inputs, processes and outputs."],["More or fewer than three phases","Match the three objectives."],["Diagram with no explanation","Write one paragraph per phase."]],
+  checks: s => {
+    const r = [];
+    [1,2,3].forEach(i => {
+      const f = ["i","p","o"].filter(k => !empty(s["p"+i+k])).length;
+      if(f === 0) r.push(todo(`Fill Phase ${i}`));
+      else r.push(f === 3 ? ok(`Phase ${i}: input, process and output filled`) : warn(`Phase ${i}: ${3-f} part(s) missing`));
+      if(f && !empty(s["obj"+i])) r.push(overlap(s["obj"+i], s["p"+i+"p"] + " " + s["p"+i+"o"]) >= 1 ? ok(`Phase ${i} delivers Objective ${i}`) : warn(`Phase ${i} shares no terms with Objective ${i}`));
+    });
+    return r;
+  }},
+{ id:"contrib", group:"Section B", name:"Expected Contributions", fields:["contrib"],
+  lede:"What the research community, practitioners or the public will gain from your findings. Tie each contribution to an objective’s output.",
+  rules:[["must","List of benefits / contributions"],["","Knowledge domain, community, practitioners, public, economy"]],
+  how:["Write one contribution per objective, based on what that phase produces.","Say who benefits: researchers, practitioners, organisations or the public.","Add a practical contribution if your artefact can be used in practice."],
+  render: () => field("contrib","Expected contributions","area","One per line, starting with “-”.",6),
+  ex: [["Expected contributions","contrib"]],
+  why:"<strong>Why it works:</strong> each contribution traces back to one objective, and the last one names a practical benefit for a real audience.",
+  mistakes:[["“This research will help society be safer”","Name what is produced and who uses it."],["Contributions unrelated to the objectives","Trace each one to a phase output."]],
+  checks: s => {
+    if(empty(s.contrib)) return [todo("List your contributions")];
+    const n = lines(s.contrib).length;
+    return [
+      n >= 3 ? ok(`${n} contributions listed`) : warn(`${n} listed: give at least one per objective`),
+      /research|practition|industr|organi[sz]ation|public|communit|team|policy|educat|economy/i.test(s.contrib) ? ok("Says who benefits") : warn("Say who benefits"),
+      /objective|model|framework|analysis|benchmark|result|guideline|dataset/i.test(s.contrib) ? ok("Linked to concrete outputs") : warn("Link each contribution to an output")
+    ];
+  }},
+{ id:"refs", group:"Section B", name:"References", fields:["refs"],
+  lede:"Every source you cited in the executive summary, in one consistent numbered style. Most should be recent peer-reviewed papers.",
+  rules:[["must","At least 20 papers"],["","IEEE numbered style [1], [2]"],["","Mostly last 5 years"]],
+  how:["Use IEEE style, numbered in the order they are first cited.","Start each entry on a new line with its number in brackets, e.g. [1].","Prefer journal and conference papers; reports are fine for statistics, blogs are not.","Check that every number cited in your text appears here, and that every entry is cited."],
+  render: () => field("refs","References","area","One entry per line, starting with [1], [2] …",10),
+  ex: [["IEEE format (placeholders)","refs"]],
+  why:"<strong>Why it works:</strong> each entry follows IEEE style with authors, title, venue, volume, pages, year and DOI. Replace the placeholders with your real sources.",
+  mistakes:[["Websites and blogs counted as papers","Use peer-reviewed sources for the 20."],["Mixed citation styles","Use IEEE throughout."],["Listed but never cited, or cited but not listed","Cross-check numbers both ways."]],
+  checks: s => {
+    if(empty(s.refs)) return [todo("Add your references")];
+    const entries = lines(s.refs).filter(l => /^\[\d+\]/.test(l));
+    const n = entries.length;
+    const years = entries.map(l => { const m = l.match(/(19|20)\d{2}/g); return m ? +m[m.length-1] : null; }).filter(Boolean);
+    const recent = years.filter(y => y >= NOW_Y - 5).length;
+    const r = [];
+    r.push(n >= 20 ? ok(`${n} references`) : warn(`${n} of at least 20 references`));
+    if(years.length) r.push(recent / years.length >= .6 ? ok(`${recent} of ${years.length} from the last five years`) : warn(`Only ${recent} of ${years.length} from the last five years`));
+    const all = [s.intro,s.background,s.ps,s.synthesis].join(" ");
+    const nums = (all.match(/\[\s*\d+(?:\s*[,–\-]\s*\d+)*\s*\]/g) || []).flatMap(x => x.match(/\d+/g).map(Number));
+    if(nums.length){ const mx = Math.max(...nums); r.push(mx <= n ? ok(`Text cites up to [${mx}], all listed`) : warn(`Text cites up to [${mx}] but only ${n} entries are listed`)); }
+    return r;
+  }},
+{ id:"req", group:"Section B", name:"Project Requirements", fields:["sw","hw","tech"],
+  lede:"The software, hardware and techniques your project needs, specific enough for the panel to judge feasibility.",
+  rules:[["","Software"],["","Hardware"],["","Technology / technique / algorithm"]],
+  how:["Software: name the languages, libraries and tools, with versions where they matter.","Hardware: give the specification you will actually use, including a GPU if your models need one.","Technique: name the specific algorithms or methods, matching your scope."],
+  render: () => field("sw","Software","area","",2) + field("hw","Hardware","area","",2) + field("tech","Technology / Technique / Methodology / Algorithm","area","",2),
+  ex: [["Software","sw"],["Hardware","hw"],["Technique","tech"]],
+  why:"<strong>Why it works:</strong> each line is specific enough to judge feasibility, and the techniques match the scope and title.",
+  mistakes:[["“Python, laptop”","Name libraries and give real specifications."],["Techniques that differ from the scope","Keep them consistent."]],
+  checks: s => [
+    empty(s.sw) ? todo("List your software") : ok("Software listed"),
+    empty(s.hw) ? todo("List your hardware") : (/\d/.test(s.hw) ? ok("Hardware has specifications") : warn("Add specifications (RAM, CPU or GPU)")),
+    empty(s.tech) ? todo("Name your techniques") : ok("Techniques named")
+  ]}
+];
+
+/* ---------- field builders ---------- */
+function field(key,label,type,hint,rows){
+  const v = esc(S[key]);
+  const ctl = type === "text"
+    ? `<input type="text" id="f-${key}" data-k="${key}" value="${v}">`
+    : `<textarea id="f-${key}" data-k="${key}" rows="${rows||4}">${v}</textarea>`;
+  return `<div class="field"><label for="f-${key}">${label}</label>${hint?`<span class="hint">${hint}</span>`:""}${ctl}<span class="meter" data-m="${key}"></span></div>`;
+}
+function selectField(key,label,opts){
+  return `<div class="field"><label for="f-${key}">${label}</label><select id="f-${key}" data-k="${key}"><option value="">Choose one…</option>${opts.map(o => `<option${S[key]===o?" selected":""}>${esc(o)}</option>`).join("")}</select></div>`;
+}
+function renderLR(){
+  const rows = S.lr.map((r,i) => `<tr><td class="n">${i+1}</td>${["a","t","d","r","l"].map(c => `<td><input type="text" id="lr-${i}-${c}" data-lr="${i}" data-c="${c}" value="${esc(r[c])}" aria-label="Row ${i+1} ${({a:"author and year",t:"technique",d:"dataset or context",r:"metrics and results",l:"limitation"})[c]}"></td>`).join("")}<td><button class="icon-btn" type="button" data-del="${i}" aria-label="Remove row ${i+1}"><span class="ms" aria-hidden="true">close</span></button></td></tr>`).join("");
+  return `<div class="field"><label>Table of comparison</label><span class="hint">One row per related work. Use the citation number from your reference list.</span>
+  <div class="scroll"><table class="lr"><tr><th></th><th>Author / Year</th><th>Technique</th><th>Dataset / Context</th><th>Metrics & Results</th><th>Limitation</th><th></th></tr>${rows}</table></div>
+  <div><button class="btn" type="button" id="addRow"><span class="ms" aria-hidden="true">add</span>Add a row</button></div></div>` + field("synthesis","Gap synthesis","area","Group the limitations into 2–3 gaps that your problem statement uses.",5);
+}
+function renderMethod(){
+  return `<div class="phases">${[1,2,3].map(i => `<div class="phase"><header><span class="num">${i}</span><span><span class="k">Phase ${i}</span><b>${["Investigate","Design and develop","Evaluate"][i-1]}</b></span></header><div class="inner">
+  <p class="obj">${empty(S["obj"+i]) ? `Objective ${i} not written yet` : esc(S["obj"+i])}</p>
+  ${["i","p","o"].map(k => `<div class="field"><label class="lab" for="f-p${i}${k}">${({i:"Input",p:"Process",o:"Output"})[k]}</label><textarea id="f-p${i}${k}" data-k="p${i}${k}" rows="3">${esc(S["p"+i+k])}</textarea></div>`).join("")}
+  </div></div>`).join("")}</div>`;
+}
+
+/* ---------- status ---------- */
+function status(sec){
+  const has = sec.fields.some(k => k === "lr" ? S.lr.some(r => Object.values(r).some(v => v.trim())) : !empty(S[k]));
+  if(!has) return "empty";
+  return sec.checks(S).every(c => c.s === "ok") ? "ready" : "partial";
+}
+
+/* ---------- rendering ---------- */
+const rail = document.getElementById("rail"), pane = document.getElementById("pane");
+let cur = 0;
+try{ const c = +localStorage.getItem(KEY+"-step"); if(c >= 0 && c <= SECTIONS.length) cur = c; }catch(e){}
+
+function renderRail(){
+  let html = "", g = "";
+  SECTIONS.forEach((s,i) => {
+    if(s.group !== g){ g = s.group; html += `<div class="rail-group">${g}</div>`; }
+    const st = status(s);
+    html += `<button class="step" type="button" data-go="${i}" aria-current="${i===cur}"><span class="badge ${st}" aria-hidden="true">${st==="ready"?'<span class="ms">check</span>':String(i+1).padStart(2,"0")}</span><span>${s.name}<span class="sr"> (${st==="ready"?"passes checks":st==="partial"?"in progress":"not started"})</span></span></button>`;
+  });
+  html += `<div class="rail-group">Finish</div><button class="step" type="button" data-go="${SECTIONS.length}" aria-current="${cur===SECTIONS.length}"><span class="badge finish" aria-hidden="true"><span class="ms">fact_check</span></span><span>Review &amp; copy draft</span></button>`;
+  html += `<div class="legend"><span><span class="badge">01</span>Not started</span><span><span class="badge partial">01</span>In progress</span><span><span class="badge ready"><span class="ms">check</span></span>Passes checks</span></div>`;
+  rail.innerHTML = html;
+  const ready = SECTIONS.filter(s => status(s) === "ready").length;
+  document.getElementById("bar").style.width = (ready / SECTIONS.length * 100) + "%";
+  document.getElementById("progressText").textContent = `${ready} of ${SECTIONS.length} sections pass the checks`;
+}
+
+function exampleHTML(sec){
+  const body = sec.exRender ? sec.exRender() : sec.ex.map(([l,k]) => `<div class="ex-item"><b>${l}</b><div class="ex-text">${esc(EX[k])}</div></div>`).join("");
+  return `<details class="example card" open><summary><span class="sec-title"><span class="ms" aria-hidden="true">menu_book</span>Worked example</span><span class="sub">Illustrative IDS topic · [n] and bracketed values are placeholders <span class="ms chev" aria-hidden="true">expand_more</span></span></summary><div class="body">${body}<div class="takeaway"><span class="i"><span class="ms" aria-hidden="true">info</span></span><span>${sec.why.replace("<strong>Why it works:</strong>","<strong>Why it works</strong>")}</span></div><div class="ex-actions"><button class="btn" type="button" id="useEx"><span class="ms" aria-hidden="true">content_copy</span><span class="lbl">Copy this example into my draft</span></button><small>Use it to see how the checks respond, then rewrite it for your own topic.</small></div></div></details>`;
+}
+
+function renderSection(){
+  if(cur === SECTIONS.length){ renderReview(); return; }
+  const sec = SECTIONS[cur];
+  pane.innerHTML = `
+  <div class="head"><p class="eyebrow">${sec.group} · Step ${cur+1} of ${SECTIONS.length}</p><h2>${sec.name}</h2><p class="lede">${sec.lede}</p>
+  <ul class="rules" aria-label="Rules from the form">${sec.rules.map(([m,t]) => `<li class="${m}"><span class="ms" aria-hidden="true">${m?"priority_high":"sell"}</span>${m?"<b>Must</b> ":""}${t}</li>`).join("")}</ul></div>
+  <div class="how card"><h3 class="sec-title"><span class="ms" aria-hidden="true">edit_note</span>How to write it</h3><ol>${sec.how.map(h => `<li><span>${h}</span></li>`).join("")}</ol></div>
+  <div class="work"><div class="editor card">${sec.render()}</div>
+    <aside class="checks card" aria-live="polite"><h3 class="sec-title"><span class="ms" aria-hidden="true">fact_check</span>Live check</h3><ul id="checks"></ul><p class="note">These checks look for structure and alignment. They guide your draft; your supervisor and the panel judge the content.</p></aside></div>
+  <div class="block">${exampleHTML(sec)}</div>
+  <div class="block"><h3 class="sec-title"><span class="ms" aria-hidden="true">report</span>Common mistakes</h3><div class="mistakes">${sec.mistakes.map(([b,f]) => `<div class="mistake card"><span class="bad"><span class="ms" aria-hidden="true">error</span><span>${b}</span></span><span class="fix"><span class="ms" aria-hidden="true">check_circle</span><span><span class="sr">Fix: </span>${f}</span></span></div>`).join("")}</div></div>
+  <div class="pager">${cur>0?`<button class="btn" type="button" data-go="${cur-1}"><span class="ms" aria-hidden="true">arrow_back</span>${SECTIONS[cur-1].name}</button>`:"<span></span>"}<button class="btn primary" type="button" data-go="${cur+1}">${cur+1<SECTIONS.length?SECTIONS[cur+1].name:"Review & copy draft"}<span class="ms" aria-hidden="true">arrow_forward</span></button></div>`;
+  updateChecks();
+}
+
+function updateChecks(){
+  if(cur === SECTIONS.length) return;
+  const sec = SECTIONS[cur], ul = document.getElementById("checks");
+  if(ul) ul.innerHTML = sec.checks(S).map(c => `<li class="chk"><span class="tag ${c.s}"><span class="ms" aria-hidden="true">${c.s==="ok"?"check_circle":c.s==="warn"?"error":"radio_button_unchecked"}</span>${c.s==="ok"?"OK":c.s==="warn"?"CHECK":"TO DO"}</span><span>${esc(c.t)}</span></li>`).join("");
+  pane.querySelectorAll("[data-m]").forEach(m => { const v = S[m.dataset.m] || ""; m.textContent = v.trim() ? `${words(v)} words · ${paras(v) || 1} paragraph(s)` : ""; });
+  renderRail();
+}
+
+function cell(v){ return empty(v) ? `<span class="empty-cell">not written</span>` : esc(v); }
+function renderReview(){
+  const thread = [
+    ["Title", S.title],["Aim", S.aim],["Main RQ", S.rqMain]
+  ];
+  const tOK = !empty(S.title) && !empty(S.aim) && !empty(S.rqMain) && overlap(S.aim,S.title) >= 3 && overlap(S.rqMain,S.title) >= 2;
+  pane.innerHTML = `
+  <div class="head"><p class="eyebrow">Finish</p><h2>Review and copy your draft</h2><p class="lede">Check the golden thread the panel traces first, fix any section still marked in progress, then copy your draft into the proposal form.</p></div>
+  <div class="block"><h3 class="sec-title"><span class="ms" aria-hidden="true">checklist</span>Section status</h3><div class="summary-grid">${SECTIONS.map((s,i) => { const c = s.checks(S); const n = c.filter(x => x.s==="ok").length; const st = status(s); return `<button class="sum" type="button" data-go="${i}"><span class="row"><b>${s.name}</b><span class="badge ${st}" aria-hidden="true">${st==="ready"?'<span class="ms">check</span>':String(i+1).padStart(2,"0")}</span></span><small>${n} of ${c.length} checks pass · ${st==="ready"?"ready":st==="partial"?"in progress":"not started"}</small></button>`; }).join("")}</div></div>
+  <div class="block"><h3 class="sec-title"><span class="ms" aria-hidden="true">linear_scale</span>Golden thread: top line</h3><p class="ex-why">Title, aim and main RQ should name the same artefact, technique and context. <span class="tag ${tOK?"ok":"warn"}"><span class="ms" aria-hidden="true">${tOK?"check_circle":"error"}</span>${tOK?"ALIGNED":"CHECK"}</span></p>
+    <div class="scroll"><table class="matrix">${thread.map(([k,v]) => `<tr><td class="k">${k}</td><td>${cell(v)}</td></tr>`).join("")}</table></div></div>
+  <div class="block"><h3 class="sec-title"><span class="ms" aria-hidden="true">account_tree</span>Golden thread: core chain</h3><p class="ex-why">Read each row across. Every sub-RQ should lead to one objective, one phase and a concrete output.</p>
+    <div class="scroll"><table class="matrix"><tr><th></th><th>Sub-RQ</th><th>Objective</th><th>Phase process</th><th>Phase output</th></tr>${[1,2,3].map(i => `<tr><td class="k">Row ${i}</td><td>${cell(S["srq"+i])}</td><td>${cell(S["obj"+i])}</td><td>${cell(S["p"+i+"p"])}</td><td>${cell(S["p"+i+"o"])}</td></tr>`).join("")}</table></div>
+    <p class="ex-why"><strong>Gaps feeding the problem statement:</strong> ${cell(S.synthesis)}</p></div>
+  <div class="block copybox card"><h3 class="sec-title"><span class="ms" aria-hidden="true">description</span>Your draft as text</h3><p class="ex-why">Copy this and paste each part into the matching box of the proposal form.</p>
+    <div class="ex-actions"><button class="btn primary" type="button" id="copyDraft"><span class="ms" aria-hidden="true">content_copy</span>Copy draft</button></div>
+    <textarea id="draftText" rows="16" readonly aria-label="Draft text">${esc(compile())}</textarea></div>
+  <div class="pager"><button class="btn" type="button" data-go="${SECTIONS.length-1}"><span class="ms" aria-hidden="true">arrow_back</span>${SECTIONS[SECTIONS.length-1].name}</button><span></span></div>`;
+  renderRail();
+}
+
+function compile(){
+  const L = [];
+  const add = (h,v) => { L.push(h.toUpperCase()); L.push(empty(v) ? "[not written]" : v.trim()); L.push(""); };
+  L.push("PROJECT 1 PROPOSAL (MECR2415) — DRAFT","");
+  add("Research Title", S.title); add("Type of Project", S.type);
+  add("Introduction", S.intro); add("Problem Background", S.background); add("Problem Statement", S.ps);
+  add("Research Questions", [S.rqMain && "Main RQ: "+S.rqMain, S.srq1 && "SRQ1: "+S.srq1, S.srq2 && "SRQ2: "+S.srq2, S.srq3 && "SRQ3: "+S.srq3].filter(Boolean).join("\n"));
+  add("Research Aim", S.aim);
+  add("Research Objectives", [S.obj1 && "1. "+S.obj1, S.obj2 && "2. "+S.obj2, S.obj3 && "3. "+S.obj3].filter(Boolean).join("\n"));
+  add("Research Scope", S.scope);
+  const rows = S.lr.filter(r => Object.values(r).some(v => v.trim())).map((r,i) => `${i+1}. ${r.a} | ${r.t} | ${r.d} | ${r.r} | ${r.l}`);
+  add("Literature Review — Table of Comparison (Author/Year | Technique | Dataset/Context | Metrics & Results | Limitation)", rows.join("\n"));
+  add("Literature Review — Gap Synthesis", S.synthesis);
+  add("Proposed Methodology", [1,2,3].map(i => `Phase ${i}\n  Input: ${S["p"+i+"i"]||"-"}\n  Process: ${S["p"+i+"p"]||"-"}\n  Output: ${S["p"+i+"o"]||"-"}`).join("\n"));
+  add("Expected Contributions", S.contrib); add("References", S.refs);
+  add("Project Requirements", `Software: ${S.sw||"-"}\nHardware: ${S.hw||"-"}\nTechnique: ${S.tech||"-"}`);
+  return L.join("\n");
+}
+
+function go(i){ cur = Math.max(0, Math.min(SECTIONS.length, i)); try{ localStorage.setItem(KEY+"-step", cur); }catch(e){} renderSection(); window.scrollTo({top:0, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth"}); }
+
+/* ---------- events ---------- */
+document.addEventListener("input", e => {
+  const t = e.target;
+  if(t.dataset.k){ S[t.dataset.k] = t.value; save(); updateChecks(); }
+  else if(t.dataset.lr !== undefined){ S.lr[+t.dataset.lr][t.dataset.c] = t.value; save(); updateChecks(); }
+});
+document.addEventListener("change", e => { const t = e.target; if(t.tagName === "SELECT" && t.dataset.k){ S[t.dataset.k] = t.value; save(); updateChecks(); } });
+
+const arm = {};
+function twoStep(btn, id, label, armedLabel, fn){
+  const lbl = btn.querySelector(".lbl") || btn;
+  if(arm[id]){ clearTimeout(arm[id]); arm[id] = null; btn.classList.remove("armed"); lbl.textContent = label; fn(); return; }
+  btn.classList.add("armed"); lbl.textContent = armedLabel;
+  arm[id] = setTimeout(() => { arm[id] = null; btn.classList.remove("armed"); lbl.textContent = label; }, 4000);
+}
+function toast(msg){ const t = document.getElementById("toast"); t.textContent = msg; t.classList.add("show"); setTimeout(() => t.classList.remove("show"), 2200); }
+
+document.addEventListener("click", e => {
+  const g = e.target.closest("[data-go]"); if(g){ go(+g.dataset.go); return; }
+  const d = e.target.closest("[data-del]");
+  if(d){ S.lr.splice(+d.dataset.del, 1); if(!S.lr.length) S.lr.push({a:"",t:"",d:"",r:"",l:""}); save(); renderSection(); return; }
+  const b = e.target.closest("button"); const bid = b ? b.id : "";
+  if(bid === "addRow"){ S.lr.push({a:"",t:"",d:"",r:"",l:""}); save(); renderSection(); const n = document.getElementById(`lr-${S.lr.length-1}-a`); if(n) n.focus(); return; }
+  if(bid === "useEx"){
+    const sec = SECTIONS[cur];
+    const hasText = sec.fields.some(k => k === "lr" ? S.lr.some(r => Object.values(r).some(v => v.trim())) : !empty(S[k]));
+    const apply = () => {
+      sec.fields.forEach(k => {
+        if(k === "lr"){ const rows = EX.lr.map(r => Object.assign({}, r)); while(rows.length < 10) rows.push({a:"",t:"",d:"",r:"",l:""}); S.lr = rows; }
+        else S[k] = EX[k];
+      });
+      save(); renderSection(); toast("Example copied into your draft");
+    };
+    if(!hasText) apply(); else twoStep(b, "useEx", "Copy this example into my draft", "This replaces your text here. Click again to confirm", apply);
+    return;
+  }
+  if(bid === "loadExample"){
+    twoStep(b, "all", "Load full example", "Replace your whole draft? Click again", () => {
+      const lr = EX.lr.map(r => Object.assign({}, r)); while(lr.length < 10) lr.push({a:"",t:"",d:"",r:"",l:""});
+      S = Object.assign(blank(), EX, {lr}); save(); renderSection(); toast("Full example loaded");
+    }); return;
+  }
+  if(bid === "clearAll"){
+    twoStep(b, "clear", "Clear my draft", "Delete everything? Click again", () => { S = blank(); save(); renderSection(); toast("Draft cleared"); }); return;
+  }
+  if(bid === "copyDraft"){
+    const ta = document.getElementById("draftText"); const txt = compile();
+    const fallback = () => { ta.focus(); ta.select(); toast("Text selected. Press Ctrl+C or ⌘C to copy"); };
+    try{ navigator.clipboard.writeText(txt).then(() => toast("Draft copied"), fallback); }catch(err){ fallback(); }
+  }
+});
+
+/* ---------- appearance ---------- */
+const root = document.documentElement;
+const hostTheme = root.getAttribute("data-theme");
+function applyTheme(mode){
+  if(mode === "light" || mode === "dark") root.setAttribute("data-theme", mode);
+  else if(hostTheme) root.setAttribute("data-theme", hostTheme);
+  else root.removeAttribute("data-theme");
+  document.querySelectorAll("[data-theme-set]").forEach(x => x.setAttribute("aria-pressed", String(x.dataset.themeSet === mode)));
+}
+let themeMode = "auto";
+try{ themeMode = localStorage.getItem(KEY+"-theme") || "auto"; }catch(e){}
+applyTheme(themeMode);
+document.querySelectorAll("[data-theme-set]").forEach(x => x.addEventListener("click", () => {
+  themeMode = x.dataset.themeSet; applyTheme(themeMode);
+  try{ localStorage.setItem(KEY+"-theme", themeMode); }catch(e){}
+}));
+
+renderSection();
+})();
+</script>
+
+</body></html>
