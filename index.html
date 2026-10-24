@@ -136,6 +136,13 @@ input[type=text]:focus,textarea:focus,select:focus{border-color:var(--blue);outl
 .takeaway .i{width:32px;height:32px;border-radius:50%;background:var(--blue);color:var(--on-blue);display:grid;place-items:center}
 .takeaway .i .ms{font-size:18px}
 .takeaway strong{font-weight:500;color:var(--blue-text);display:block}
+.ex-head{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.ex-lab{font-size:12px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2)}
+.ex-seg button{font-size:13px}
+.ex-topic{display:grid;grid-template-columns:24px 1fr;gap:10px;align-items:start;font-size:15px;line-height:1.45;padding-bottom:12px;border-bottom:1px solid var(--line)}
+.ex-topic .ms{color:var(--blue);font-size:22px}
+.ex-topic b{font-weight:500;color:var(--blue-text);font-size:13px;letter-spacing:.03em;text-transform:uppercase}
+tr.cur td{background:var(--tint)}
 .ex-why{font-size:14px;color:var(--ink2);max-width:74ch}
 .ex-why strong{color:var(--ink);font-weight:500}
 .ex-actions{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
@@ -223,6 +230,7 @@ tr:last-child td{border-bottom:0}
         <button type="button" data-theme-set="dark" aria-pressed="false"><span class="ms" aria-hidden="true">dark_mode</span>Dark</button>
       </div>
       <div class="progress" aria-live="polite"><div class="bar"><span id="bar"></span></div><small id="progressText">0 of 13 sections ready</small></div>
+      <div class="tool-row"><span class="ex-lab">Example topic</span><span id="hdrEx"></span></div>
       <div class="tool-row">
         <button class="btn" id="loadExample" type="button"><span class="ms" aria-hidden="true">auto_stories</span><span class="lbl">Load full example</span></button>
         <button class="btn" id="clearAll" type="button"><span class="ms" aria-hidden="true">restart_alt</span><span class="lbl">Clear my draft</span></button>
@@ -270,43 +278,130 @@ const ARTEFACT = /\b(model|framework|scheme|algorithm|system|approach|technique|
 const ok = t => ({s:"ok",t}), warn = t => ({s:"warn",t}), todo = t => ({s:"todo",t});
 const empty = s => !s || !s.trim();
 
-/* ---------- worked example (illustrative IDS topic) ---------- */
-const EX = {
-title:"An Enhanced Intrusion Detection Model Using Hybrid Feature Selection and Ensemble Learning for IoT Healthcare Networks",
-type:"Information Security Analysis & Mechanism (e.g. Detection, PenTest, Forensic)",
-intro:"Network security protects the confidentiality, integrity and availability of data as it moves between connected devices [1]. Healthcare providers now depend on networked medical devices, electronic health records and remote patient monitoring, which widens the attack surface of hospital networks. According to [2], healthcare organisations reported [number] security incidents in [year], making network protection a direct patient-safety concern.\n\nIntrusion detection is a key research area within network security. An intrusion detection system (IDS) monitors network traffic to identify malicious activity that firewalls and access controls miss [3]. Machine learning based IDS can recognise new attack patterns, but IoT healthcare networks generate high-volume, imbalanced traffic from resource-limited devices, which makes accurate and timely detection difficult [4]. Improving intrusion detection for these networks is therefore important for protecting both patient data and clinical services.",
-background:"Researchers have approached intrusion detection in IoT networks with signature-based and anomaly-based methods. Signature-based IDS detect known attacks accurately but cannot recognise new variants [5]. Anomaly-based IDS using machine learning were introduced to close this gap, yet several studies report high false-positive rates when attack classes are imbalanced [6], [7].\n\nA second challenge is the high dimensionality of IoT traffic data. Filter and wrapper feature selection methods have been used to remove irrelevant features and shorten training time [8], [9]. However, single-method feature selection can discard features that matter for rare attack classes [9].\n\nA third challenge is robustness. Ensemble learning combines several classifiers to give more stable results across attack types [10]. Studies in IoT settings, however, note longer detection times when ensembles run on resource-limited devices [11]. Together, these challenges show that accuracy, false alarms and detection time still need to be balanced.",
-ps:"Existing machine learning based IDS for IoT networks [6], [9] achieve high overall accuracy, but they report high false-positive rates and weak detection of minority attack classes when traffic is imbalanced (a false-positive rate of [X]% is reported in [9]). This happens because single-method feature selection removes features that are important for rare attacks, and single classifiers tend to favour majority classes [9], [11]. As a result, security teams in healthcare settings face alert fatigue and may miss rare but critical attacks. Therefore, this study proposes an enhanced intrusion detection model that combines hybrid feature selection with ensemble learning to reduce false positives while keeping detection time acceptable for IoT healthcare networks.",
-rqMain:"How can hybrid feature selection and ensemble learning improve intrusion detection in IoT healthcare networks?",
-srq1:"How do existing machine learning based intrusion detection approaches perform, and what limits them in IoT healthcare networks?",
-srq2:"How can a hybrid feature selection and ensemble learning model be designed to address these limitations?",
-srq3:"How effective is the proposed model compared with existing models in accuracy, false-positive rate and detection time?",
-aim:"To develop an enhanced intrusion detection model based on hybrid feature selection and ensemble learning that reduces false-positive rates and improves the detection of minority attack classes in IoT healthcare networks.",
-obj1:"To investigate existing machine learning based intrusion detection approaches and identify their limitations in IoT healthcare networks.",
-obj2:"To design and develop an enhanced intrusion detection model using hybrid feature selection and ensemble learning.",
-obj3:"To evaluate the proposed model against existing models in terms of accuracy, false-positive rate and detection time.",
-scope:"- Uses the [dataset name and version] public IoT intrusion dataset [ref]\n- Covers DoS, brute-force, reconnaissance and spoofing attacks only\n- Hybrid feature selection combines one filter method and one wrapper method\n- Experiments are offline only; real-time deployment in a hospital network is excluded\n- Evaluation metrics: accuracy, precision, recall, F1-score, false-positive rate and detection time",
+/* ---------- worked examples (three illustrative topics) ---------- */
+const REFS_FMT = "[1] A. Author and B. Author, \"Title of the paper,\" Journal Name, vol. X, no. Y, pp. 1–15, 2024, doi: [DOI].\n[2] [Organisation], \"Title of the report,\" [Publisher], [Year]. [Online]. Available: [URL]\n[3] C. Author, D. Author, and E. Author, \"Title of the conference paper,\" in Proc. [Conference Name], [City], 2023, pp. 100–110.";
+
+const EXAMPLES = {
+devsecops: {
+label:"AI Security in DevSecOps", short:"DevSecOps", parts:["Vulnerability prioritisation framework","AI-driven machine learning risk scoring","DevSecOps (CI/CD) pipelines"],
+title:"An AI-Driven Vulnerability Prioritisation Framework Using Machine Learning Risk Scoring for DevSecOps Pipelines",
+type:"Security Applications in Computing (e.g. Cloud, Grid, Distributed Environment)",
+intro:"DevSecOps integrates security practices into every stage of the software delivery pipeline, from code commit to deployment [1]. As organisations release software many times a day, security checks must run automatically inside continuous integration and continuous delivery (CI/CD) pipelines. According to [2], [percentage]% of organisations reported a security incident linked to their software supply chain in [year], which shows why pipeline security is now critical.\n\nAI security in DevSecOps applies machine learning to tasks such as detecting vulnerable code, triaging scanner findings and predicting exploitable weaknesses [3]. Automated scanners produce large volumes of findings, many of which are false positives or low risk, so developers struggle to decide what to fix first [4]. Applying AI to prioritise these findings is therefore needed to keep pipelines both fast and secure.",
+background:"Researchers first addressed vulnerability detection inside pipelines through static application security testing (SAST) and software composition analysis (SCA) tools [5]. These tools find known weakness patterns and vulnerable dependencies reliably, but they report many findings without context about real risk [6].\n\nA second line of work prioritises findings using severity scores such as the Common Vulnerability Scoring System (CVSS) [7]. However, static severity scores do not show whether a weakness is reachable or likely to be exploited in a specific application, so teams still spend time on low-risk issues [8].\n\nA third line of work applies machine learning to predict exploitability or to classify scanner findings as true or false positives [9], [10]. These models show promising accuracy, yet most are evaluated offline on single datasets and are rarely integrated into a working CI/CD pipeline [11]. Turning scanner output into a trusted, pipeline-ready priority list remains an open challenge.",
+ps:"Existing approaches to vulnerability prioritisation in DevSecOps [7], [9] rank scanner findings by static severity or by offline machine learning models, but they produce high false-positive rates and do not reflect application context (a false-positive share of [X]% is reported in [9]). This happens because severity scores ignore reachability and exploit likelihood, and machine learning models are rarely retrained or validated inside live pipelines [8], [11]. As a result, developers face alert fatigue, real risks are fixed late, and security gates are often bypassed to protect release speed. Therefore, this study proposes an AI-driven vulnerability prioritisation framework that combines machine learning risk scoring with pipeline context to rank findings in DevSecOps pipelines.",
+rqMain:"How can machine learning risk scoring improve vulnerability prioritisation in DevSecOps pipelines?",
+srq1:"How do existing vulnerability prioritisation approaches perform in DevSecOps pipelines, and what limits them?",
+srq2:"How can an AI-driven framework be designed to score and rank vulnerability findings using pipeline context?",
+srq3:"How effective is the proposed framework compared with severity-based ranking in precision, false-positive rate and pipeline run time?",
+aim:"To develop an AI-driven vulnerability prioritisation framework that uses machine learning risk scoring and pipeline context to rank scanner findings and reduce false positives in DevSecOps pipelines.",
+obj1:"To investigate existing vulnerability prioritisation approaches and identify their limitations in DevSecOps pipelines.",
+obj2:"To design and develop an AI-driven framework that scores and ranks vulnerability findings using machine learning and pipeline context.",
+obj3:"To evaluate the proposed framework against severity-based ranking in terms of precision, false-positive rate and pipeline run time.",
+scope:"- Case study: [number] open-source projects with GitHub Actions CI/CD pipelines\n- Findings from one SAST tool and one SCA tool, labelled using the [public vulnerability dataset name and version] [ref]\n- Covers web applications written in Python and JavaScript only\n- Risk scoring uses supervised machine learning with severity, reachability and exploit-likelihood features\n- Evaluation metrics: precision, recall, false-positive rate and added pipeline run time\n- Excludes runtime protection and production monitoring",
 lr:[
- {a:"[Author] et al. (2023) [6]",t:"Random forest anomaly IDS",d:"[IoT dataset]",r:"High accuracy; FPR [X]%",l:"High false positives on imbalanced classes"},
- {a:"[Author] et al. (2022) [9]",t:"Filter feature selection + SVM",d:"[IoT dataset]",r:"Shorter training time",l:"Drops features needed for rare attacks"},
- {a:"[Author] et al. (2024) [11]",t:"Stacking ensemble",d:"[IoT dataset]",r:"Stable accuracy across classes",l:"Long detection time on edge devices"}
+ {a:"[Author] et al. (2023) [7]",t:"CVSS-based finding ranking",d:"[Enterprise CI/CD case study]",r:"Simple to deploy; consistent scores",l:"Ignores reachability and exploit likelihood"},
+ {a:"[Author] et al. (2022) [9]",t:"ML classifier for SAST false positives",d:"[Open-source SAST dataset]",r:"Precision [X]%",l:"Evaluated offline, not inside a pipeline"},
+ {a:"[Author] et al. (2024) [11]",t:"Exploit prediction model",d:"[Public vulnerability dataset]",r:"Good exploit prediction",l:"Not linked to application context"}
 ],
-synthesis:"Across the reviewed works, three gaps recur: (1) high false-positive rates when attack classes are imbalanced, (2) feature selection that removes features needed to detect rare attacks, and (3) detection times that are too long for resource-limited IoT devices. These gaps form the problem statement of this study and the benchmarks for its evaluation.",
-p1i:"Related papers; candidate public IoT intrusion datasets",
-p1p:"Review and compare existing ML-based IDS; analyse dataset characteristics and limitations",
-p1o:"Comparison table; list of limitations; model requirements",
-p2i:"Requirements and selected dataset from Phase 1",
-p2p:"Pre-process data; apply hybrid feature selection; design and train the ensemble model",
-p2o:"The enhanced intrusion detection model",
-p3i:"Proposed model; benchmark models from the literature",
-p3p:"Test using accuracy, precision, recall, F1-score, false-positive rate and detection time; compare results",
-p3o:"Evaluation results and comparison against benchmarks",
-contrib:"- A comparative analysis of machine learning based IDS for IoT healthcare networks, useful to researchers in the field (Objective 1)\n- An enhanced intrusion detection model using hybrid feature selection and ensemble learning (Objective 2)\n- Benchmark results showing how the model performs against existing models (Objective 3)\n- Practical guidance for healthcare security teams on reducing false alarms",
-refs:"[1] A. Author and B. Author, \"Title of the paper,\" Journal Name, vol. X, no. Y, pp. 1–15, 2024, doi: [DOI].\n[2] [Organisation], \"Title of the threat report,\" [Publisher], [Year]. [Online]. Available: [URL]\n[3] C. Author, D. Author, and E. Author, \"Title of the conference paper,\" in Proc. [Conference Name], [City], 2023, pp. 100–110.",
-sw:"Python 3.x with scikit-learn, pandas and NumPy; Jupyter Notebook; Git for version control",
-hw:"Laptop with a multi-core CPU and 16 GB RAM; optional GPU for larger experiments",
-tech:"Filter feature selection (e.g. information gain) combined with wrapper feature selection; ensemble classifiers (e.g. random forest, gradient boosting)"
+synthesis:"Across the reviewed works, three gaps recur: (1) static severity scores ignore whether a vulnerability is reachable or likely to be exploited, (2) machine learning models reduce false positives but are evaluated offline rather than inside live pipelines, and (3) few approaches combine risk scoring with pipeline context. These gaps form the problem statement of this study and the benchmarks for its evaluation.",
+p1i:"Related papers; scanner outputs from the case-study pipelines",
+p1p:"Review and compare existing prioritisation approaches; analyse scanner findings and their false-positive patterns",
+p1o:"Comparison table; list of limitations; framework requirements",
+p2i:"Requirements from Phase 1; labelled vulnerability findings",
+p2p:"Engineer risk features; train the machine learning risk-scoring model; integrate ranking into the CI/CD pipeline",
+p2o:"The AI-driven vulnerability prioritisation framework",
+p3i:"Proposed framework; severity-based ranking as the benchmark",
+p3p:"Run both approaches on the case-study pipelines; measure precision, false-positive rate and pipeline run time",
+p3o:"Evaluation results and comparison with the benchmark",
+contrib:"- A comparative analysis of vulnerability prioritisation approaches for DevSecOps, useful to researchers (Objective 1)\n- An AI-driven vulnerability prioritisation framework that runs inside CI/CD pipelines (Objective 2)\n- Benchmark results comparing machine learning risk scoring with severity-based ranking (Objective 3)\n- Practical guidance for DevSecOps teams on reducing alert fatigue",
+refs:REFS_FMT,
+sw:"Python 3.x with scikit-learn and pandas; GitHub Actions; one open-source SAST tool and one SCA tool; Docker",
+hw:"Laptop with a multi-core CPU and 16 GB RAM; cloud CI runners for pipeline tests",
+tech:"Supervised machine learning (e.g. gradient boosting) for risk scoring; feature engineering from severity, reachability and exploit-likelihood data"
+},
+
+aisafety: {
+label:"Security Assessment for AI Safety", short:"AI Safety", parts:["Security assessment framework","Structured adversarial testing","LLM chatbots in financial services"],
+title:"A Security Assessment Framework Using Structured Adversarial Testing for Evaluating the Safety of LLM Chatbots in Financial Services",
+type:"Information Security Management & System",
+intro:"AI security protects AI systems and the people who use them from misuse, manipulation and harmful outputs [1]. Large language models (LLMs) are now built into customer-facing chatbots that answer questions, handle account requests and give guidance, which creates new risks such as prompt injection and leakage of customer data [2]. According to [3], [number] of organisations deploying generative AI reported a security or safety incident in [year], making AI safety a critical business and regulatory concern.\n\nSecurity assessment for AI safety is the research area that tests whether an AI system resists attacks and avoids unsafe behaviour before and after deployment [4]. Red-teaming, in which testers deliberately try to make a model misbehave, is a common method, but it is often informal and hard to repeat [5]. A structured assessment approach is needed so that organisations, especially in regulated sectors such as financial services, can measure and compare the safety of their chatbots.",
+background:"Researchers first addressed LLM safety through benchmark datasets that test models for harmful, biased or untruthful outputs [6]. These benchmarks allow models to be compared, but they test the base model rather than a deployed chatbot with its own prompts, tools and data [7].\n\nA second line of work studies attacks on deployed LLM applications, such as prompt injection, jailbreaking and sensitive data leakage [8], [9]. These studies describe attack techniques in detail; however, they rarely turn them into a repeatable assessment procedure that an organisation can follow [9].\n\nA third line of work proposes AI risk management frameworks and guidelines [10], [11]. These frameworks define governance principles but remain high level, and they do not specify test cases, scoring or pass criteria for a chatbot. Assessing chatbot safety in a structured, measurable and repeatable way therefore remains a challenge.",
+ps:"Existing approaches to AI safety assessment [6], [10] either benchmark base models or provide high-level governance guidance, but they do not give organisations a repeatable way to test deployed chatbots against attacks such as prompt injection and data leakage (only [X] of [Y] reviewed frameworks define concrete test cases in [10]). This happens because benchmarks ignore application-specific prompts, tools and data, while governance frameworks stop at principles without measurable criteria [7], [11]. As a result, financial institutions may deploy chatbots whose safety has not been tested consistently. Therefore, this study proposes a security assessment framework that uses structured adversarial testing to evaluate the safety of LLM chatbots in financial services.",
+rqMain:"How can structured adversarial testing be used to assess the safety of LLM chatbots in financial services?",
+srq1:"How do existing AI safety assessment approaches test LLM chatbots, and what limits them?",
+srq2:"How can a security assessment framework be designed with structured adversarial test cases, scoring and pass criteria?",
+srq3:"How effective is the proposed framework in detecting unsafe chatbot behaviour, measured by attack success rate, test coverage and repeatability?",
+aim:"To develop a security assessment framework that uses structured adversarial testing to evaluate the safety of LLM chatbots in financial services in a measurable and repeatable way.",
+obj1:"To investigate existing AI safety assessment approaches and identify their limitations for LLM chatbots.",
+obj2:"To design and develop a security assessment framework with structured adversarial test cases, scoring and pass criteria.",
+obj3:"To evaluate the proposed framework on case-study chatbots in terms of attack success rate, test coverage and repeatability.",
+scope:"- Case study: [number] LLM-based customer service chatbots (prototype or vendor sandbox) in the financial services sector\n- Attack categories: prompt injection, jailbreaking, sensitive data leakage and harmful financial advice only\n- Test cases are adapted from the [public AI safety benchmark or attack taxonomy and version] [ref]\n- Black-box assessment through the chatbot interface only\n- Evaluation metrics: attack success rate, test coverage and repeatability between testers\n- Excludes model training, fine-tuning and live production systems",
+lr:[
+ {a:"[Author] et al. (2023) [6]",t:"Safety benchmark for base LLMs",d:"[Benchmark dataset]",r:"Compares models across harm categories",l:"Tests base models, not deployed chatbots"},
+ {a:"[Author] et al. (2024) [9]",t:"Prompt injection attack study",d:"[LLM-integrated applications]",r:"High attack success on tested apps",l:"No repeatable assessment procedure"},
+ {a:"[Organisation] (2023) [10]",t:"AI risk management framework",d:"[Cross-sector guidance]",r:"Defines governance principles",l:"No test cases or pass criteria"}
+],
+synthesis:"Across the reviewed works, three gaps recur: (1) safety benchmarks test base models rather than deployed chatbots, (2) attack studies describe techniques but do not provide a repeatable assessment procedure, and (3) governance frameworks lack measurable test cases and pass criteria. These gaps form the problem statement of this study and the benchmarks for its evaluation.",
+p1i:"Related papers; AI safety benchmarks; AI risk frameworks",
+p1p:"Review and compare existing AI safety assessment approaches; map attack categories for chatbots",
+p1o:"Comparison table; list of limitations; framework requirements",
+p2i:"Requirements and attack taxonomy from Phase 1",
+p2p:"Design structured adversarial test cases; define scoring rules and pass criteria; document the assessment procedure",
+p2o:"The security assessment framework",
+p3i:"Proposed framework; case-study chatbots",
+p3p:"Apply the framework with two independent testers; measure attack success rate, test coverage and repeatability",
+p3o:"Assessment results and comparison with informal red-teaming",
+contrib:"- A comparative analysis of AI safety assessment approaches for LLM chatbots, useful to researchers (Objective 1)\n- A structured security assessment framework with test cases, scoring and pass criteria (Objective 2)\n- Assessment results showing how the framework performs on case-study chatbots (Objective 3)\n- A practical checklist that financial institutions and auditors can use before deploying chatbots",
+refs:REFS_FMT,
+sw:"Python 3.x for test automation; an LLM chatbot sandbox or open-source chatbot stack; a database or spreadsheet for logging results",
+hw:"Laptop with a multi-core CPU and 16 GB RAM; access to a hosted LLM API or a local GPU with 8 GB or more",
+tech:"Structured adversarial testing (red-teaming); attack taxonomy mapping; scoring rubric with pass criteria; inter-rater agreement for repeatability"
+},
+
+pii: {
+label:"Enhanced PII Detector Framework", short:"PII Detection", parts:["PII detection framework","Hybrid rule-based and transformer models","Malaysian personal data in unstructured documents"],
+title:"An Enhanced PII Detection Framework Using Hybrid Rule-Based and Transformer Models for Malaysian Personal Data in Unstructured Documents",
+type:"Information Security Analysis & Mechanism (e.g. Detection, PenTest, Forensic)",
+intro:"Data privacy protection ensures that personal data is collected, stored and shared only in lawful and secure ways [1]. Organisations hold large volumes of unstructured documents such as emails, forms and letters, and the personal data inside them is easily exposed through leaks or careless sharing. In Malaysia, the Personal Data Protection Act 2010 requires data users to safeguard personal data, and [2] reports [number] personal data breaches in [year], which makes privacy protection a critical compliance need.\n\nPersonally identifiable information (PII) detection is the research area that automatically finds personal data, such as names, identity card numbers and addresses, in text [3]. Accurate detection supports data masking, data loss prevention and responses to data subject requests [4]. However, most detectors are built for English text and Western identifier formats, so they miss Malaysian identifiers and mixed Malay-English text, which makes improved PII detection important for local organisations.",
+background:"Researchers first addressed PII detection with rule-based methods that use regular expressions and dictionaries to match known patterns such as identity numbers and phone numbers [5]. These methods are precise for well-formatted identifiers, but they miss PII that appears in free text, such as names and addresses [6].\n\nA second line of work applies named entity recognition (NER) with machine learning and transformer models to detect PII in context [7], [8]. These models detect names and locations well in English; however, their accuracy drops on low-resource languages and code-mixed text [9].\n\nA third line of work combines rules and machine learning in hybrid detectors [10]. Hybrid detectors improve recall for common identifiers, yet most are tuned to one language and one set of identifier formats, and few report results on locally formatted data [11]. Detecting PII accurately in Malaysian, mixed-language documents therefore remains a challenge.",
+ps:"Existing PII detectors [6], [8] achieve high precision on English text and standard identifier formats, but they show low recall on Malaysian personal data such as MyKad numbers, local name structures and code-mixed Malay-English text (a recall of [X]% on non-English text is reported in [9]). This happens because rule sets do not cover local identifier formats and transformer models are trained mainly on English data [9], [11]. As a result, organisations may leave personal data unmasked in shared documents and fail to meet their data protection obligations. Therefore, this study proposes an enhanced PII detection framework that combines rule-based matching with a transformer model fine-tuned for Malaysian personal data in unstructured documents.",
+rqMain:"How can a hybrid rule-based and transformer approach improve the detection of Malaysian personal data in unstructured documents?",
+srq1:"How do existing PII detection approaches perform on Malaysian personal data, and what limits them?",
+srq2:"How can a hybrid detection framework be designed that combines local identifier rules with a fine-tuned transformer model?",
+srq3:"How effective is the proposed framework compared with existing detectors in precision, recall and F1-score?",
+aim:"To develop an enhanced PII detection framework that combines rule-based matching with a fine-tuned transformer model to improve the detection of Malaysian personal data in unstructured documents.",
+obj1:"To investigate existing PII detection approaches and identify their limitations on Malaysian personal data.",
+obj2:"To design and develop a hybrid PII detection framework using local identifier rules and a fine-tuned transformer model.",
+obj3:"To evaluate the proposed framework against existing detectors in terms of precision, recall and F1-score.",
+scope:"- Dataset: [number] synthetic Malaysian documents (forms, emails and letters) created for this study, plus the [public English PII dataset name and version] [ref]\n- PII types: names, MyKad numbers, phone numbers, email addresses and postal addresses only\n- Languages: English, Malay and code-mixed Malay-English text\n- Synthetic data only; no real personal data is processed\n- Evaluation metrics: precision, recall and F1-score per PII type\n- Excludes images, handwriting and scanned documents without a text layer",
+lr:[
+ {a:"[Author] et al. (2022) [6]",t:"Regex and dictionary PII matcher",d:"[English documents]",r:"High precision on formatted IDs",l:"Misses names and addresses in free text"},
+ {a:"[Author] et al. (2023) [8]",t:"Transformer-based NER for PII",d:"[English PII dataset]",r:"F1 [X]% on English text",l:"Accuracy drops on Malay and mixed text"},
+ {a:"[Author] et al. (2024) [11]",t:"Hybrid rules + ML detector",d:"[Single-language corpus]",r:"Higher recall on common identifiers",l:"Not tuned for Malaysian identifier formats"}
+],
+synthesis:"Across the reviewed works, three gaps recur: (1) rule-based detectors miss PII that appears in free text, (2) transformer models trained mainly on English lose accuracy on Malay and code-mixed text, and (3) hybrid detectors are not tuned for Malaysian identifier formats. These gaps form the problem statement of this study and the benchmarks for its evaluation.",
+p1i:"Related papers; public PII datasets; Malaysian identifier formats",
+p1p:"Review and compare existing PII detection approaches; test them on sample Malaysian text",
+p1o:"Comparison table; list of limitations; framework requirements",
+p2i:"Requirements from Phase 1; synthetic Malaysian documents",
+p2p:"Write rules for local identifiers; fine-tune a transformer model; combine both in one detection pipeline",
+p2o:"The enhanced PII detection framework",
+p3i:"Proposed framework; existing detectors as benchmarks",
+p3p:"Test on held-out documents; measure precision, recall and F1-score per PII type; compare results",
+p3o:"Evaluation results and comparison with benchmarks",
+contrib:"- A comparative analysis of PII detection approaches for Malaysian personal data, useful to researchers (Objective 1)\n- An enhanced hybrid PII detection framework for English, Malay and code-mixed documents (Objective 2)\n- Benchmark results comparing the framework with existing detectors (Objective 3)\n- A synthetic Malaysian PII test set and practical guidance for organisations on meeting data protection obligations",
+refs:REFS_FMT,
+sw:"Python 3.x with Hugging Face Transformers, spaCy and pandas; Jupyter Notebook; Git",
+hw:"Laptop with 16 GB RAM; GPU with 8 GB or more (local or cloud) for fine-tuning",
+tech:"Regular-expression rules for Malaysian identifiers; fine-tuned multilingual transformer for named entity recognition; merging of rule and model outputs"
+}
 };
+let exKey = "devsecops";
+try{ const k = localStorage.getItem(KEY+"-ex"); if(EXAMPLES[k]) exKey = k; }catch(e){}
+const X = () => EXAMPLES[exKey];
+function exSwitch(id){
+  return `<div class="seg ex-seg" role="group" aria-label="Example topic">${Object.entries(EXAMPLES).map(([k,v]) => `<button type="button" data-ex="${k}" aria-pressed="${k===exKey}">${v.short}</button>`).join("")}</div>`;
+}
 
 /* ---------- sections ---------- */
 const TYPES = ["Information Security Management & System","Information Security Analysis & Mechanism (e.g. Detection, PenTest, Forensic)","Cryptography","Mobile and Wireless Security","Security Applications in Computing (e.g. Cloud, Grid, Distributed Environment)","Others"];
@@ -318,7 +413,8 @@ const SECTIONS = [
   how:["Name the artefact you will produce: a model, framework, scheme, algorithm or system.","Add the specific technique or approach you will use to build it.","Add the domain, platform or case study it applies to.","Tick the Type of Project that matches the artefact."],
   render: () => field("title","Research title","text","Aim for 10 to 20 words.") + selectField("type","Type of Project (Section B checkbox)",TYPES),
   ex: [["Research title","title"],["Type of Project","type"]],
-  why:"<strong>Why it works:</strong> it names one artefact (an intrusion detection model), one technique (hybrid feature selection and ensemble learning) and one context (IoT healthcare networks).",
+  exExtra: () => `<div class="ex-item"><b>How the three example titles are built</b><div class="scroll"><table><tr><th>Example</th><th>Artefact</th><th>Technique</th><th>Context</th></tr>${Object.entries(EXAMPLES).map(([k,v]) => `<tr${k===exKey?' class="cur"':''}><td>${esc(v.label)}</td><td>${esc(v.parts[0])}</td><td>${esc(v.parts[1])}</td><td>${esc(v.parts[2])}</td></tr>`).join("")}</table></div></div>`,
+  why:"<strong>Why it works:</strong> it names one artefact, one technique and one context, so the panel knows exactly what will be built, how, and where. Compare all three example titles in the table above.",
   mistakes:[["Too broad: “Cybersecurity in Healthcare”","Name the artefact and the technique, not just the topic."],["Buzzword stacking: “AI-Blockchain-Zero-Trust Framework”","Pick the one technique your study will actually build on."],["Type of Project ticked does not match the title","A detection model belongs under Analysis & Mechanism."]],
   checks: s => {
     const r = [];
@@ -338,7 +434,7 @@ const SECTIONS = [
   how:["Paragraph 1, research domain: what it is and why it matters (e.g. Network Security). Support it with a recent, cited figure.","Paragraph 2, research area: the specific area you work in (e.g. Intrusion Detection), its benefits, and why it is needed now.","End by narrowing toward the problem, so the next section follows naturally."],
   render: () => field("intro","Introduction","area","Separate the two paragraphs with a blank line.",10),
   ex: [["Introduction","intro"]],
-  why:"<strong>Why it works:</strong> paragraph 1 sets the domain and its importance with a cited figure; paragraph 2 narrows to intrusion detection and says why it is hard in this context. Bracketed values are placeholders for real figures from your sources.",
+  why:"<strong>Why it works:</strong> paragraph 1 sets the domain and its importance with a cited figure; paragraph 2 narrows to the specific research area and says why it is needed now. Bracketed values are placeholders for real figures from your sources.",
   mistakes:[["Reads like a textbook definition","Explain why the area matters now, with evidence."],["No recent figures or citations","Use at least one cited figure per paragraph."],["Three or more paragraphs, or over a page","Keep it to two focused paragraphs."]],
   checks: s => {
     if(empty(s.intro)) return [todo("Write two paragraphs")];
@@ -374,7 +470,7 @@ const SECTIONS = [
   how:["Name the existing approaches closest to yours and cite them.","State their limitation precisely, with a reported figure where possible.","Explain why the limitation happens.","State the consequence for the domain.","End with what this study proposes to address it."],
   render: () => `<div class="banner"><span class="ms" aria-hidden="true">lightbulb</span><span>A pattern that works: <em>Existing approaches [x], [y] achieve A, but suffer from B (reported as C in [z]) because D. As a result, E. Therefore, this study proposes F.</em></span></div>` + field("ps","Problem statement","area","One or two paragraphs.",9),
   ex: [["Problem statement","ps"]],
-  why:"<strong>Why it works:</strong> it follows the pattern exactly. The limitation is specific and cited, the cause is explained, the consequence is stated, and the proposal answers the gap. Works [6], [9] and [11] will become the benchmarks in Chapter 5 and must appear in the comparison table.",
+  why:"<strong>Why it works:</strong> it follows the pattern exactly. The limitation is specific and cited, the cause is explained, the consequence is stated, and the proposal answers the gap. The works cited here become the benchmarks in Chapter 5 and must appear in the comparison table.",
   mistakes:[["“No research has been done on this”","Prove the gap with cited limitations instead."],["Vague gaps such as “accuracy is still low”","Quote what was reported and where."],["The only gap is “not yet applied in Malaysia”","Explain why the local context changes the problem."]],
   checks: s => {
     if(empty(s.ps)) return [todo("Write your problem statement")];
@@ -454,7 +550,7 @@ const SECTIONS = [
   how:["List one boundary per line.","Name the dataset (with version and reference) or the case study organisation type.","State which attacks, scenarios or components are covered.","Name the techniques and the evaluation metrics.","State what is excluded, such as real-time deployment."],
   render: () => field("scope","Research scope","area","One boundary per line, starting with “-”.",7),
   ex: [["Research scope","scope"]],
-  why:"<strong>Why it works:</strong> each line is a clear boundary. The panel can see the dataset, attack types, techniques, metrics and what is out of scope.",
+  why:"<strong>Why it works:</strong> each line is a clear boundary. The panel can see the data or case study, what is covered, the techniques, the metrics and what is out of scope.",
   mistakes:[["“This research focuses on IDS”","That is a topic. List the boundaries."],["Dataset named without version or source","Give the version and reference."],["No exclusions","Say what you will not do."]],
   checks: s => {
     if(empty(s.scope)) return [todo("List your boundaries")];
@@ -471,7 +567,7 @@ const SECTIONS = [
   rules:[["must","Table of comparison, ≥10 works"],["must","Summarise the gaps"],["must","Align with Problem Statement"],["","Citations"]],
   how:["Collect at least 10 works close to your topic, mostly from the last five years.","Fill the same five columns for every work. The Limitation column is the one the panel reads most closely.","Make sure every work cited in your problem statement appears in this table.","Below the table, group the limitations into two or three gaps. These must match your problem statement."],
   render: renderLR,
-  exRender: () => `<div class="scroll"><table><tr><th>Author / Year</th><th>Technique</th><th>Dataset / Context</th><th>Metrics & Results</th><th>Limitation</th></tr>${EX.lr.map(r => `<tr><td>${esc(r.a)}</td><td>${esc(r.t)}</td><td>${esc(r.d)}</td><td>${esc(r.r)}</td><td>${esc(r.l)}</td></tr>`).join("")}</table></div><div class="ex-item"><b>Gap synthesis</b><div class="ex-text">${esc(EX.synthesis)}</div></div>`,
+  exRender: () => `<div class="scroll"><table><tr><th>Author / Year</th><th>Technique</th><th>Dataset / Context</th><th>Metrics & Results</th><th>Limitation</th></tr>${X().lr.map(r => `<tr><td>${esc(r.a)}</td><td>${esc(r.t)}</td><td>${esc(r.d)}</td><td>${esc(r.r)}</td><td>${esc(r.l)}</td></tr>`).join("")}</table></div><div class="ex-item"><b>Gap synthesis</b><div class="ex-text">${esc(X().synthesis)}</div></div>`,
   why:"<strong>Why it works:</strong> the columns are identical for every work, the limitation is specific, and the synthesis turns the limitations into three gaps that reappear in the problem statement. Your table needs at least 10 rows; the example shows 3.",
   mistakes:[["Fewer than 10 works, or mostly old papers","Aim for 10+ from the last five years."],["Columns change from paper to paper","Use the same five columns throughout."],["No synthesis after the table","Group limitations into 2–3 gaps."]],
   checks: s => {
@@ -492,7 +588,7 @@ const SECTIONS = [
   rules:[["must","Framework diagram, 3 phases"],["must","Input → process → output per phase"],["must","Each phase ↔ one objective"],["must","Explain each phase"]],
   how:["Copy each objective into the matching phase (shown above each column).","Input: what you start the phase with (papers, datasets, requirements).","Process: what you actually do.","Output: what the phase produces. It is usually the next phase’s input.","Turn these three columns into your framework diagram, then write one paragraph per phase."],
   render: renderMethod,
-  exRender: () => `<div class="phases">${[1,2,3].map(i => `<div class="phase"><header><span class="num">${i}</span><span><span class="k">Phase ${i} · Objective ${i}</span><b>${["Investigation","Design and development","Evaluation"][i-1]}</b></span></header><div class="inner"><div><div class="lab">Input</div>${esc(EX["p"+i+"i"])}</div><div><div class="lab">Process</div>${esc(EX["p"+i+"p"])}</div><div><div class="lab">Output</div>${esc(EX["p"+i+"o"])}</div></div></div>`).join("")}</div>`,
+  exRender: () => `<div class="phases">${[1,2,3].map(i => `<div class="phase"><header><span class="num">${i}</span><span><span class="k">Phase ${i} · Objective ${i}</span><b>${["Investigation","Design and development","Evaluation"][i-1]}</b></span></header><div class="inner"><div><div class="lab">Input</div>${esc(X()["p"+i+"i"])}</div><div><div class="lab">Process</div>${esc(X()["p"+i+"p"])}</div><div><div class="lab">Output</div>${esc(X()["p"+i+"o"])}</div></div></div>`).join("")}</div>`,
   why:"<strong>Why it works:</strong> each phase delivers one objective, its inputs and outputs are concrete, and the output of each phase feeds the next.",
   mistakes:[["Generic flow: Literature Review → Design → Testing → Report","Show real inputs, processes and outputs."],["More or fewer than three phases","Match the three objectives."],["Diagram with no explanation","Write one paragraph per phase."]],
   checks: s => {
@@ -596,6 +692,7 @@ let cur = 0;
 try{ const c = +localStorage.getItem(KEY+"-step"); if(c >= 0 && c <= SECTIONS.length) cur = c; }catch(e){}
 
 function renderRail(){
+  const h = document.getElementById("hdrEx"); if(h) h.innerHTML = exSwitch();
   let html = "", g = "";
   SECTIONS.forEach((s,i) => {
     if(s.group !== g){ g = s.group; html += `<div class="rail-group">${g}</div>`; }
@@ -611,8 +708,8 @@ function renderRail(){
 }
 
 function exampleHTML(sec){
-  const body = sec.exRender ? sec.exRender() : sec.ex.map(([l,k]) => `<div class="ex-item"><b>${l}</b><div class="ex-text">${esc(EX[k])}</div></div>`).join("");
-  return `<details class="example card" open><summary><span class="sec-title"><span class="ms" aria-hidden="true">menu_book</span>Worked example</span><span class="sub">Illustrative IDS topic · [n] and bracketed values are placeholders <span class="ms chev" aria-hidden="true">expand_more</span></span></summary><div class="body">${body}<div class="takeaway"><span class="i"><span class="ms" aria-hidden="true">info</span></span><span>${sec.why.replace("<strong>Why it works:</strong>","<strong>Why it works</strong>")}</span></div><div class="ex-actions"><button class="btn" type="button" id="useEx"><span class="ms" aria-hidden="true">content_copy</span><span class="lbl">Copy this example into my draft</span></button><small>Use it to see how the checks respond, then rewrite it for your own topic.</small></div></div></details>`;
+  const body = sec.exRender ? sec.exRender() : sec.ex.map(([l,k]) => `<div class="ex-item"><b>${l}</b><div class="ex-text">${esc(X()[k])}</div></div>`).join("");
+  return `<details class="example card" open><summary><span class="sec-title"><span class="ms" aria-hidden="true">menu_book</span>Worked example</span><span class="sub">${esc(X().label)} · [n] and bracketed values are placeholders <span class="ms chev" aria-hidden="true">expand_more</span></span></summary><div class="body"><div class="ex-head"><span class="ex-lab">Example topic</span>${exSwitch()}</div><div class="ex-topic"><span class="ms" aria-hidden="true">topic</span><span><b>${esc(X().label)}</b><br>${esc(X().title)}</span></div>${body}${sec.exExtra ? sec.exExtra() : ""}<div class="takeaway"><span class="i"><span class="ms" aria-hidden="true">info</span></span><span>${sec.why.replace("<strong>Why it works:</strong>","<strong>Why it works</strong>")}</span></div><div class="ex-actions"><button class="btn" type="button" id="useEx"><span class="ms" aria-hidden="true">content_copy</span><span class="lbl">Copy this example into my draft</span></button><small>Use it to see how the checks respond, then rewrite it for your own topic.</small></div></div></details>`;
 }
 
 function renderSection(){
@@ -699,6 +796,8 @@ function toast(msg){ const t = document.getElementById("toast"); t.textContent =
 
 document.addEventListener("click", e => {
   const g = e.target.closest("[data-go]"); if(g){ go(+g.dataset.go); return; }
+  const xb = e.target.closest("[data-ex]");
+  if(xb){ exKey = xb.dataset.ex; try{ localStorage.setItem(KEY+"-ex", exKey); }catch(err){} const det = pane.querySelector("details.example"); const open = det ? det.open : true; renderSection(); const d2 = pane.querySelector("details.example"); if(d2) d2.open = open; toast(`Showing example: ${X().label}`); return; }
   const d = e.target.closest("[data-del]");
   if(d){ S.lr.splice(+d.dataset.del, 1); if(!S.lr.length) S.lr.push({a:"",t:"",d:"",r:"",l:""}); save(); renderSection(); return; }
   const b = e.target.closest("button"); const bid = b ? b.id : "";
@@ -708,18 +807,18 @@ document.addEventListener("click", e => {
     const hasText = sec.fields.some(k => k === "lr" ? S.lr.some(r => Object.values(r).some(v => v.trim())) : !empty(S[k]));
     const apply = () => {
       sec.fields.forEach(k => {
-        if(k === "lr"){ const rows = EX.lr.map(r => Object.assign({}, r)); while(rows.length < 10) rows.push({a:"",t:"",d:"",r:"",l:""}); S.lr = rows; }
-        else S[k] = EX[k];
+        if(k === "lr"){ const rows = X().lr.map(r => Object.assign({}, r)); while(rows.length < 10) rows.push({a:"",t:"",d:"",r:"",l:""}); S.lr = rows; }
+        else S[k] = X()[k];
       });
-      save(); renderSection(); toast("Example copied into your draft");
+      save(); renderSection(); toast(`Copied from example: ${X().label}`);
     };
     if(!hasText) apply(); else twoStep(b, "useEx", "Copy this example into my draft", "This replaces your text here. Click again to confirm", apply);
     return;
   }
   if(bid === "loadExample"){
     twoStep(b, "all", "Load full example", "Replace your whole draft? Click again", () => {
-      const lr = EX.lr.map(r => Object.assign({}, r)); while(lr.length < 10) lr.push({a:"",t:"",d:"",r:"",l:""});
-      S = Object.assign(blank(), EX, {lr}); save(); renderSection(); toast("Full example loaded");
+      const lr = X().lr.map(r => Object.assign({}, r)); while(lr.length < 10) lr.push({a:"",t:"",d:"",r:"",l:""});
+      const {label, short, parts, ...fields} = X(); S = Object.assign(blank(), fields, {lr}); save(); renderSection(); toast(`Loaded example: ${label}`);
     }); return;
   }
   if(bid === "clearAll"){
